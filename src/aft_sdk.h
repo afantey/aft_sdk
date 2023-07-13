@@ -11,6 +11,7 @@
 #include "sdk_def.h"
 #include "sdk_utils.h"
 #include "sdk_soft_timer.h"
+#include "sdk_os_port.h"
 
 
 #ifdef __cplusplus
