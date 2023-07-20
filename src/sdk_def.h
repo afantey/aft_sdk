@@ -111,10 +111,11 @@ typedef union
 #define SDK_CONTROL_UART_ENABLE_RX        8
 #define SDK_CONTROL_UART_DISABLE_RX       9
 
-#define SDK_DRIVER_RTC_GET_TIME  0 /**< Get time */
-#define SDK_DRIVER_RTC_SET_TIME  1 /**< Set time */
-#define SDK_DRIVER_RTC_GET_ALARM 2 /**< Get alarm */
-#define SDK_DRIVER_RTC_SET_ALARM 3 /**< Set alarm */
+#define SDK_CONTROL_RTC_GET_TIME   0 /**< Get time */
+#define SDK_CONTROL_RTC_SET_TIME   1 /**< Set time */
+#define SDK_CONTROL_RTC_GET_ALARM  2 /**< Get alarm */
+#define SDK_CONTROL_RTC_SET_ALARM  3 /**< Set alarm */
+#define SDK_CONTROL_RTC_SET_WAKEUP 4
 
 #define SDK_DRIVER_WDT_GET_TIMEOUT    (1) /* get timeout(in seconds) */
 #define SDK_DRIVER_WDT_SET_TIMEOUT    (2) /* set timeout(in seconds) */

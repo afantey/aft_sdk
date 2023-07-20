@@ -28,18 +28,18 @@ void example_rtc_init(void)
 {
     time_t t = 0;
     sdk_rtc_open(&rtc);
-    sdk_rtc_control(&rtc, SDK_DRIVER_RTC_GET_TIME, &t);
+    sdk_rtc_control(&rtc, SDK_CONTROL_RTC_GET_TIME, &t);
     sdk_printtime(t);
     t = 1672212552;
-    sdk_rtc_control(&rtc, SDK_DRIVER_RTC_SET_TIME, &t);
-    sdk_rtc_control(&rtc, SDK_DRIVER_RTC_GET_TIME, &t);
+    sdk_rtc_control(&rtc, SDK_CONTROL_RTC_SET_TIME, &t);
+    sdk_rtc_control(&rtc, SDK_CONTROL_RTC_GET_TIME, &t);
     sdk_printtime(t);
 }
 
 void example_rtc_run(void)
 {
     time_t t = 0;
-    sdk_rtc_control(&rtc, SDK_DRIVER_RTC_GET_TIME, &t);
+    sdk_rtc_control(&rtc, SDK_CONTROL_RTC_GET_TIME, &t);
     sdk_printtime(t);
     t = time(NULL);
     printf("time(NULL) ");

@@ -51,7 +51,7 @@ sdk_err_t sdk_rtc_set_date(sdk_rtc_t *rtc, uint32_t year, uint32_t month, uint32
     sdk_err_t ret = -SDK_ERROR;
 
     /* get current time */
-    ret = sdk_rtc_control(rtc, SDK_DRIVER_RTC_GET_TIME, &old_timestamp);
+    ret = sdk_rtc_control(rtc, SDK_CONTROL_RTC_GET_TIME, &old_timestamp);
     if (ret != SDK_OK)
     {
         return ret;
@@ -70,7 +70,7 @@ sdk_err_t sdk_rtc_set_date(sdk_rtc_t *rtc, uint32_t year, uint32_t month, uint32
     now = mktime(&tm_new);
 
     /* update to RTC device. */
-    ret = sdk_rtc_control(rtc, SDK_DRIVER_RTC_SET_TIME, &now);
+    ret = sdk_rtc_control(rtc, SDK_CONTROL_RTC_SET_TIME, &now);
     return ret;
 }
 
@@ -90,7 +90,7 @@ sdk_err_t sdk_rtc_set_time(sdk_rtc_t *rtc, uint32_t hour, uint32_t minute, uint3
     sdk_err_t ret = -SDK_ERROR;
 
     /* get current time */
-    ret = sdk_rtc_control(rtc, SDK_DRIVER_RTC_GET_TIME, &old_timestamp);
+    ret = sdk_rtc_control(rtc, SDK_CONTROL_RTC_GET_TIME, &old_timestamp);
     if (ret != SDK_OK)
     {
         return ret;
@@ -108,7 +108,7 @@ sdk_err_t sdk_rtc_set_time(sdk_rtc_t *rtc, uint32_t hour, uint32_t minute, uint3
     now = mktime(&tm_new);
 
     /* update to RTC device. */
-    ret = sdk_rtc_control(rtc, SDK_DRIVER_RTC_SET_TIME, &now);
+    ret = sdk_rtc_control(rtc, SDK_CONTROL_RTC_SET_TIME, &now);
     return ret;
 }
 
@@ -122,7 +122,7 @@ sdk_err_t sdk_rtc_set_time(sdk_rtc_t *rtc, uint32_t hour, uint32_t minute, uint3
 sdk_err_t sdk_rtc_set_timestamp(sdk_rtc_t *rtc, time_t timestamp)
 {
     /* update to RTC device. */
-    return sdk_rtc_control(rtc, SDK_DRIVER_RTC_SET_TIME, &timestamp);
+    return sdk_rtc_control(rtc, SDK_CONTROL_RTC_SET_TIME, &timestamp);
 }
 
 /**
@@ -135,7 +135,7 @@ sdk_err_t sdk_rtc_set_timestamp(sdk_rtc_t *rtc, time_t timestamp)
 sdk_err_t sdk_rtc_get_timestamp(sdk_rtc_t *rtc, time_t *timestamp)
 {
     /* Get timestamp from RTC device. */
-    return sdk_rtc_control(rtc, SDK_DRIVER_RTC_GET_TIME, timestamp);
+    return sdk_rtc_control(rtc, SDK_CONTROL_RTC_GET_TIME, timestamp);
 }
 
 void sdk_printtime(time_t t)

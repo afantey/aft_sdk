@@ -16,7 +16,7 @@ time_t time (time_t *_timer)
     int ret;
     if(_timer != NULL)
     {
-        ret = sdk_rtc_control(&rtc, SDK_DRIVER_RTC_SET_TIME, _timer);
+        ret = sdk_rtc_control(&rtc, SDK_CONTROL_RTC_SET_TIME, _timer);
         if(ret != SDK_OK)
         {
             time_dat = 0;
@@ -28,7 +28,7 @@ time_t time (time_t *_timer)
     }
     else
     {
-        ret = sdk_rtc_control(&rtc, SDK_DRIVER_RTC_GET_TIME, &time_dat); 
+        ret = sdk_rtc_control(&rtc, SDK_CONTROL_RTC_GET_TIME, &time_dat); 
     }
     return time_dat;
 }
