@@ -266,7 +266,7 @@ fdb_err_t _fdb_flash_read(fdb_db_t db, uint32_t addr, void *buf, size_t size)
 #endif
     } else {
 #ifdef FDB_USING_FAL_MODE
-        if (fal_partition_read(db->storage.part, addr, (uint8_t *) buf, size) < 0) {
+        if (upm_partition_read(db->storage.part, addr, (uint8_t *) buf, size) < 0) {
             result = FDB_READ_ERR;
         }
 #endif
@@ -287,7 +287,7 @@ fdb_err_t _fdb_flash_erase(fdb_db_t db, uint32_t addr, size_t size)
 #endif /* FDB_USING_FILE_MODE */
     } else {
 #ifdef FDB_USING_FAL_MODE
-        if (fal_partition_erase(db->storage.part, addr, size) < 0) {
+        if (upm_partition_erase(db->storage.part, addr, size) < 0) {
             result = FDB_ERASE_ERR;
         }
 #endif
@@ -308,7 +308,7 @@ fdb_err_t _fdb_flash_write(fdb_db_t db, uint32_t addr, const void *buf, size_t s
 #endif /* FDB_USING_FILE_MODE */
     } else {
 #ifdef FDB_USING_FAL_MODE
-        if (fal_partition_write(db->storage.part, addr, (uint8_t *)buf, size) < 0)
+        if (upm_partition_write(db->storage.part, addr, (uint8_t *)buf, size) < 0)
         {
             result = FDB_WRITE_ERR;
         }

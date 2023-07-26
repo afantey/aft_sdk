@@ -20,7 +20,7 @@
 #include <fdb_cfg.h>
 
 #ifdef FDB_USING_FAL_MODE
-#include <fal.h>
+#include <upm.h>
 #endif
 
 #include <fdb_def.h>

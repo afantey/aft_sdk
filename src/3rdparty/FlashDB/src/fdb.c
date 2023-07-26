@@ -54,14 +54,14 @@ fdb_err_t _fdb_init_ex(fdb_db_t db, const char *name, const char *path, fdb_db_t
         size_t block_size;
 
         /* FAL (Flash Abstraction Layer) initialization */
-        fal_init();
+        upm_init();
         /* check the flash partition */
-        if ((db->storage.part = fal_partition_find(path)) == NULL) {
+        if ((db->storage.part = upm_partition_find(path)) == NULL) {
             FDB_INFO("Error: Partition (%s) not found.\n", path);
             return FDB_PART_NOT_FOUND;
         }
 
-        block_size = fal_flash_device_find(db->storage.part->flash_name)->blk_size;
+        block_size = upm_stor_dev_find(db->storage.part->stor_dev_name)->blk_size;
         if (db->sec_size == 0) {
             db->sec_size = block_size;
         } else {

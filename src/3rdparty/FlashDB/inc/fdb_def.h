@@ -257,7 +257,7 @@ struct fdb_db {
     fdb_db_type type;                            /**< database type */
     union {
 #ifdef FDB_USING_FAL_MODE
-        const struct fal_partition *part;        /**< flash partition for saving database */
+        const struct upm_partition *part;        /**< flash partition for saving database */
 #endif
 #ifdef FDB_USING_FILE_MODE
         const char *dir;                         /**< directory path for saving database */
