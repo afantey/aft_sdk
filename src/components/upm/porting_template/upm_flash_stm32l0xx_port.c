@@ -32,10 +32,10 @@ static int erase(long offset, size_t size)
 }
 
 const struct upm_stor_dev upm_flash_stm32 ={
-        .name = "stm32_onchip",
+        .name = "onchip",
         .addr = 0x08000000,
         .len = 128 * 1024,
-        .blk_size = 1 * 1024,
+        .blk_size = 128,
         .ops.init = init,
         .ops.read = read,
         .ops.write = write,

@@ -38,7 +38,7 @@ typedef struct upm_stor_dev *upm_stor_dev_t;
 /**
  * uni partition manager
  */
-struct upm
+struct upm_partition
 {
     uint32_t magic_word;
 
@@ -53,6 +53,6 @@ struct upm
 
     uint32_t reserved;
 };
-typedef struct upm *upm_t;
+typedef struct upm_partition *upm_partition_t;
 
 #endif /* __UPM_DEF_H */

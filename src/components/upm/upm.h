@@ -20,13 +20,13 @@ int upm_init(void);
 const struct upm_stor_dev *upm_stor_dev_find(const char *name);
 
 /* =============== partition operator API =============== */
-const struct upm *upm_find(const char *name);
-const struct upm *upm_get_partition_table(size_t *len);
-void upm_set_partition_table_temp(struct upm *table, size_t len);
-int upm_partition_read(const struct upm *part, uint32_t addr, uint8_t *buf, size_t size);
-int upm_partition_write(const struct upm *part, uint32_t addr, const uint8_t *buf, size_t size);
-int upm_partition_erase(const struct upm *part, uint32_t addr, size_t size);
-int upm_partition_erase_all(const struct upm *part);
+const struct upm_partition *upm_partition_find(const char *name);
+const struct upm_partition *upm_get_partition_table(size_t *len);
+void upm_set_partition_table_temp(struct upm_partition *table, size_t len);
+int upm_partition_read(const struct upm_partition *part, uint32_t addr, uint8_t *buf, size_t size);
+int upm_partition_write(const struct upm_partition *part, uint32_t addr, const uint8_t *buf, size_t size);
+int upm_partition_erase(const struct upm_partition *part, uint32_t addr, size_t size);
+int upm_partition_erase_all(const struct upm_partition *part);
 void upm_show_part_table(void);
 
 #ifdef __cplusplus

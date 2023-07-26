@@ -14,14 +14,16 @@
 
 #define UPM_PART_MAGIC_WORD         0x47575954
 
+#define assert(x)
+
 struct part_stor_info
 {
     const struct upm_stor_dev *stor_dev;
 };
 
 /* partition table definition */
-static const struct upm partition_table_def[] = UPT_PARTITION_TABLE;
-static const struct upm *partition_table = NULL;
+static const struct upm_partition partition_table_def[] = UPT_PARTITION_TABLE;
+static const struct upm_partition *partition_table = NULL;
 /* partition object information cache table */
 static struct part_stor_info part_stor_cache[sizeof(partition_table_def) / sizeof(partition_table_def[0])] = { 0 };
 
@@ -36,7 +38,7 @@ void upm_show_part_table(void)
 {
     char *item1 = "name", *item2 = "stor_dev";
     size_t i, part_name_max = strlen(item1), stor_dev_name_max = strlen(item2);
-    const struct upm *part;
+    const struct upm_partition *part;
 
     if (partition_table_len)
     {
@@ -67,7 +69,7 @@ void upm_show_part_table(void)
     LOG_I("=============================================================\n");
 }
 
-static int check_and_update_part_cache(const struct upm *table, size_t len)
+static int check_and_update_part_cache(const struct upm_partition *table, size_t len)
 {
     const struct upm_stor_dev *stor_dev = NULL;
     size_t i;
@@ -122,7 +124,7 @@ _exit:
     return partition_table_len;
 }
 
-const struct upm *upm_find(const char *name)
+const struct upm_partition *upm_partition_find(const char *name)
 {
     if(init_ok != 1)
     {
@@ -142,7 +144,7 @@ const struct upm *upm_find(const char *name)
     return NULL;
 }
 
-static const struct upm_stor_dev *stor_dev_find_by_part(const struct upm *part)
+static const struct upm_stor_dev *stor_dev_find_by_part(const struct upm_partition *part)
 {
     assert(part >= partition_table);
     assert(part <= &partition_table[partition_table_len - 1]);
@@ -150,7 +152,7 @@ static const struct upm_stor_dev *stor_dev_find_by_part(const struct upm *part)
     return part_stor_cache[part - partition_table].stor_dev;
 }
 
-const struct upm *upm_get_partition_table(size_t *len)
+const struct upm_partition *upm_get_partition_table(size_t *len)
 {
     assert(init_ok);
     assert(len);
@@ -161,7 +163,7 @@ const struct upm *upm_get_partition_table(size_t *len)
 }
 
 
-void upm_set_partition_table_temp(struct upm *table, size_t len)
+void upm_set_partition_table_temp(struct upm_partition *table, size_t len)
 {
     assert(init_ok);
     assert(table);
@@ -181,7 +183,7 @@ void upm_set_partition_table_temp(struct upm *table, size_t len)
  * @param size The number of bytes to read.
  * @return The number of bytes read, or -1 if an error occurs.
  */
-int upm_partition_read(const struct upm *part, uint32_t addr, uint8_t *buf, size_t size)
+int upm_partition_read(const struct upm_partition *part, uint32_t addr, uint8_t *buf, size_t size)
 {
     int ret = 0;
     const struct upm_stor_dev *stor_dev = NULL;
@@ -222,7 +224,7 @@ int upm_partition_read(const struct upm *part, uint32_t addr, uint8_t *buf, size
  * @param size The number of bytes to write.
  * @return The number of bytes written, or -1 if an error occurs.
  */
-int upm_partition_write(const struct upm *part, uint32_t addr, const uint8_t *buf, size_t size)
+int upm_partition_write(const struct upm_partition *part, uint32_t addr, const uint8_t *buf, size_t size)
 {
     int ret = 0;
     const struct upm_stor_dev *stor_dev = NULL;
@@ -255,7 +257,7 @@ int upm_partition_write(const struct upm *part, uint32_t addr, const uint8_t *bu
     return ret;
 }
 
-int upm_partition_erase(const struct upm *part, uint32_t addr, size_t size)
+int upm_partition_erase(const struct upm_partition *part, uint32_t addr, size_t size)
 {
     int ret = 0;
     const struct upm_stor_dev *stor_dev = NULL;
@@ -284,7 +286,7 @@ int upm_partition_erase(const struct upm *part, uint32_t addr, size_t size)
     return ret;
 }
 
-int upm_partition_erase_all(const struct upm *part)
+int upm_partition_erase_all(const struct upm_partition *part)
 {
     return upm_partition_erase(part, 0, part->len);
 }
