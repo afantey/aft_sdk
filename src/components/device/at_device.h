@@ -30,6 +30,7 @@ enum at_cmd_state
     AT_CMD_STAT_START,
     AT_CMD_STAT_SEND,
     AT_CMD_STAT_WAIT_REV,
+    AT_CMD_STAT_RETRY,
     AT_CMD_STAT_REVOK,
     AT_CMD_STAT_TIMEOUT
 };
@@ -143,8 +144,8 @@ void at_obj_set_end_sign(at_client_t client, char ch);
 void at_obj_set_urc_table(at_client_t client, const struct at_urc *urc_table, size_t table_sz);
 int at_resp_parse_line_args_by_kw(struct at_resp *resp, const char *keyword, const char *resp_expr, ...);
 at_resp_status_t at_cmd_common(struct at_client *client, char *format, ...);
-at_resp_status_t at_cmd_common_ex(struct at_client *client, int retry, int interval_ms, at_resp_status_t (*parse_func)(struct at_resp *resp), char *format, ...);
-enum at_cmd_state AT_DATA_SEND(struct at_client *client, int timeout_s, uint8_t *data, int data_len);
+at_resp_status_t at_cmd_common_ex(struct at_client *client, int retry, int timeout_ms, at_resp_status_t (*parse_func)(struct at_resp *resp), char *format, ...);
+enum at_cmd_state AT_DATA_SEND(struct at_client *client, int timeout_ms, uint8_t *data, int data_len);
 
 
 #ifdef __cplusplus

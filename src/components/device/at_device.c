@@ -327,7 +327,7 @@ enum at_cmd_state at_parser_wait_resp(struct at_client *client, int timeout_s)
     return cmd->state;
 }
 
-enum at_cmd_state AT_DATA_SEND(struct at_client *client, int timeout_s, uint8_t *data, int data_len)
+enum at_cmd_state AT_DATA_SEND(struct at_client *client, int timeout_ms, uint8_t *data, int data_len)
 {
     struct at_cmd *cmd = client->cmd;
     struct at_resp *resp = client->resp;
@@ -341,7 +341,7 @@ enum at_cmd_state AT_DATA_SEND(struct at_client *client, int timeout_s, uint8_t 
     {
         sdk_uart_write(client->uart_port, data, data_len);
         cmd->state = AT_CMD_STAT_WAIT_REV;
-        swtimer_set(&cmd->timer_wait_recv, timeout_s * 1000);
+        swtimer_set(&cmd->timer_wait_recv, timeout_ms);
         resp->parser_state = AT_RESP_PARSER_STAT_START;
         break;
     }
@@ -365,7 +365,7 @@ enum at_cmd_state AT_DATA_SEND(struct at_client *client, int timeout_s, uint8_t 
     return cmd->state;
 }
 
-enum at_cmd_state AT_CMD_SEND(struct at_client *client, int timeout_s, uint8_t retry, char *cmd_str, int cmd_len)
+enum at_cmd_state AT_CMD_SEND(struct at_client *client, uint8_t retry, int timeout_ms, char *cmd_str, int cmd_len)
 {
     struct at_cmd *cmd = client->cmd;
     struct at_resp *resp = client->resp;
@@ -382,7 +382,7 @@ enum at_cmd_state AT_CMD_SEND(struct at_client *client, int timeout_s, uint8_t r
         cmd->trycnt++;
         sdk_uart_write(client->uart_port, (uint8_t *)cmd_str, cmd_len);
         cmd->state = AT_CMD_STAT_WAIT_REV;
-        swtimer_set(&cmd->timer_wait_recv, timeout_s * 1000);
+        swtimer_set(&cmd->timer_wait_recv, timeout_ms);
         resp->parser_state = AT_RESP_PARSER_STAT_START;
         break;
     }
@@ -423,7 +423,7 @@ at_resp_status_t at_cmd_common(struct at_client *client, char *format, ...)
     n = vsnprintf(cmd_str, sizeof(cmd_str) - 1, format, va);
     va_end(va);
             
-    enum at_cmd_state cmd_state = AT_CMD_SEND(client, 1, 2, cmd_str, n);
+    enum at_cmd_state cmd_state = AT_CMD_SEND(client, 0, 5000, cmd_str, n);
     if(cmd_state == AT_CMD_STAT_REVOK)
     {
         status = client->resp->resp_status;
@@ -432,12 +432,12 @@ at_resp_status_t at_cmd_common(struct at_client *client, char *format, ...)
     return status;
 }
 
-at_resp_status_t at_cmd_common_ex(struct at_client *client, int retry, int interval_ms, at_resp_status_t (*parse_func)(struct at_resp *resp), char *format, ...)
+at_resp_status_t at_cmd_common_ex(struct at_client *client, int retry, int timeout_ms, at_resp_status_t (*parse_func)(struct at_resp *resp), char *format, ...)
 {
     struct at_cmd *cmd = client->cmd;
     struct at_resp *resp = client->resp;
     at_resp_status_t status = AT_RESP_WAITING;
-
+    int interval_ms = 1000;
     switch (cmd->state_send)
     {
     case AT_CMD_STAT_START:
@@ -454,7 +454,7 @@ at_resp_status_t at_cmd_common_ex(struct at_client *client, int retry, int inter
         n = vsnprintf(cmd_str, sizeof(cmd_str) - 1, format, va);
         va_end(va);
                 
-        enum at_cmd_state cmd_state = AT_CMD_SEND(client, 1, 2, cmd_str, n);
+        enum at_cmd_state cmd_state = AT_CMD_SEND(client, retry, timeout_ms, cmd_str, n);
         if (cmd_state == AT_CMD_STAT_REVOK)
         {
             status = resp->resp_status;
@@ -466,22 +466,10 @@ at_resp_status_t at_cmd_common_ex(struct at_client *client, int retry, int inter
                     if (status == AT_RESP_OK)
                     {
                         cmd->state_send = AT_CMD_STAT_START;
-                        break;
                     }
                     else
                     {
-                        if (cmd->trycnt_send > retry)
-                        {
-                            status = AT_RESP_TIMEOUT;
-                            cmd->state_send = AT_CMD_STAT_START;
-                        }
-                        else
-                        {
-                            cmd->trycnt_send++;
-                            status = AT_RESP_WAITING;
-                            cmd->state_send = AT_CMD_STAT_WAIT_REV;
-                            swtimer_set(&cmd->timer_send, interval_ms);
-                        }
+                        cmd->state_send = AT_CMD_STAT_RETRY;
                     }
                 }
                 else
@@ -491,27 +479,28 @@ at_resp_status_t at_cmd_common_ex(struct at_client *client, int retry, int inter
             }
             else if(status == AT_RESP_ERROR)
             {
-                if (cmd->trycnt_send > retry)
-                {
-                    status = AT_RESP_TIMEOUT;
-                    cmd->state_send = AT_CMD_STAT_START;
-                }
-                else
-                {
-                    cmd->trycnt_send++;
-                    status = AT_RESP_WAITING;
-                    cmd->state_send = AT_CMD_STAT_WAIT_REV;
-                    swtimer_set(&cmd->timer_send, interval_ms);
-                }
+                cmd->state_send = AT_CMD_STAT_RETRY;
             }
-            else if(status == AT_RESP_TIMEOUT)
-            {
-                status = AT_RESP_TIMEOUT;
-                cmd->state_send = AT_CMD_STAT_START;
-            }
+        }
+        else if(cmd_state == AT_CMD_STAT_TIMEOUT)
+        {
+            cmd->state_send = AT_CMD_STAT_TIMEOUT;
         }
         break;
     }
+    case AT_CMD_STAT_RETRY:
+        if (cmd->trycnt_send > retry)
+        {
+            cmd->state_send = AT_CMD_STAT_TIMEOUT;
+        }
+        else
+        {
+            cmd->trycnt_send++;
+            status = AT_RESP_WAITING;
+            cmd->state_send = AT_CMD_STAT_WAIT_REV;
+            swtimer_set(&cmd->timer_send, interval_ms);
+        }
+        break;
     case AT_CMD_STAT_WAIT_REV:
         if (swtimer_expired(&cmd->timer_send))
         {
@@ -520,7 +509,10 @@ at_resp_status_t at_cmd_common_ex(struct at_client *client, int retry, int inter
             break;
         }
         break;
-    
+    case AT_CMD_STAT_TIMEOUT:
+        status = AT_RESP_TIMEOUT;
+        cmd->state_send = AT_CMD_STAT_START;
+        break;
     default:
         break;
     }
