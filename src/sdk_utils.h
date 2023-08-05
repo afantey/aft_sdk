@@ -20,6 +20,11 @@ extern "C" {
 
 #define ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]))
 
+double get_float_phys_from_hex(uint32_t hex, int offset, double factor);
+int get_int_phys_from_hex(uint32_t hex, int offset, double factor);
+uint16_t get_hex16_from_float_phys(double phys, int offset, double factor);
+uint16_t get_hex16_from_int_phys(int phys, int offset, double factor);
+uint32_t get_hex32_from_float_phys(double phys, int offset, double factor);
 
 #ifdef __cplusplus
 }
