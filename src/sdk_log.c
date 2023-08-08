@@ -85,3 +85,5 @@ int sdk_printf(const char *format, ...)
 
     return length;
 }
+
+int printf(const char *fmt, ...) __attribute__((alias("sdk_printf")));
