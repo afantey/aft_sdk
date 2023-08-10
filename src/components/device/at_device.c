@@ -479,6 +479,7 @@ at_resp_status_t at_cmd_common_ex(struct at_client *client, int retry, int timeo
             }
             else if(status == AT_RESP_ERROR)
             {
+                status = AT_RESP_WAITING;
                 cmd->state_send = AT_CMD_STAT_RETRY;
             }
         }
