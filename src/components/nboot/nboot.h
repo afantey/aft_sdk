@@ -9,6 +9,7 @@
 enum {
     IMAGE_STATE_INVALID = 0,
     IMAGE_STATE_DOWNLOAD_OK,
+    IMAGE_STATE_READY_TO_DOWNLOAD,
 };
 
 #define IMAGE_DOWN_MAGIC            0xa5389ace
@@ -92,5 +93,5 @@ int nboot_set_image_down_state(uint8_t down_state, uint32_t down_size);
  * @param flash_ctx         临时区（固件下载区）Flash操作上下文
  */
 void boot_app(const Temp_Flash_Context *flash_ctx);
-
+void JumpToApp(__IO uint32_t AppAddr);
 #endif
