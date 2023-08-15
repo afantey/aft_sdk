@@ -70,6 +70,8 @@ int sdk_printf(const char *format, ...);
 
 #define LOG_HEX(width, buf, size) sdklog_hexdump(width, buf, size)
 
+#define sdk_printf(...) printf(__VA_ARGS__)
+
 #define LOG_RAW(...)    sdk_printf(__VA_ARGS__)
 
 #ifdef __cplusplus
