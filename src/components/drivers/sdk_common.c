@@ -11,6 +11,10 @@ __WEAK void sdk_hw_console_output(const char *str)
 {
 }
 
+__WEAK void sdk_hw_console_putc(const int ch)
+{
+}
+
 __WEAK void sdk_hw_us_delay(uint32_t us)
 {
     (void) us;

@@ -71,19 +71,8 @@ void sdklog_hexdump(uint32_t width, uint8_t *buf, uint32_t len)
     sdk_hw_console_output(temp);
 }
 
-int sdk_printf(const char *format, ...)
+int fputc(int ch, FILE *f)
 {
-    va_list ap;
-    size_t length;
-    char buf[SDK_LOG_BUF_LEN] = {0};
-
-    va_start(ap, format);
-
-    length = vsnprintf(buf, sizeof(buf) - 1, format, ap);
-    sdk_hw_console_output(buf);
-    va_end(ap);
-
-    return length;
+    sdk_hw_console_putc(ch);
+    return ch;
 }
-
-int printf(const char *fmt, ...) __attribute__((alias("sdk_printf")));

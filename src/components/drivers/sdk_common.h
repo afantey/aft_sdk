@@ -14,6 +14,7 @@ extern "C" {
 #endif
 
 void sdk_hw_console_output(const char *str);
+void sdk_hw_console_putc(const int ch);
 void sdk_hw_us_delay(uint32_t us);
 void sdk_hw_ms_delay(uint32_t ms);
 void sdk_hw_interrupt_enable(void);
