@@ -20,6 +20,7 @@ void sdk_hw_ms_delay(uint32_t ms);
 void sdk_hw_interrupt_enable(void);
 void sdk_hw_interrupt_disable(void);
 uint32_t sdk_hw_get_systick(void);
+void sdk_hw_system_reset(void);
 
 #ifdef __cplusplus
 }

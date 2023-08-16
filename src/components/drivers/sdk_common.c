@@ -41,3 +41,7 @@ __WEAK uint32_t sdk_hw_get_systick(void)
     return 0;
 }
 
+__WEAK void sdk_hw_system_reset(void)
+{
+    return 0;
+}
