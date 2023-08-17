@@ -13,7 +13,6 @@ extern "C" {
 
 void sdklog(char *level, char *module, const char *format, ...);
 void sdklog_hexdump(uint32_t width, uint8_t *buf, uint32_t len);
-int sdk_printf(const char *format, ...);
 
 /* DEBUG level */
 #define DBG_ERROR           0
