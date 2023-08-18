@@ -4,8 +4,8 @@
  * 2023-07-30     rgw             first version
  */
 
-#include "aft_sdk.h"
 #include "modbus.h"
+#include "aft_sdk.h"
 
 #define DBG_TAG "modbus"
 #define DBG_LVL DBG_LOG
@@ -15,11 +15,11 @@
 
 typedef struct
 {
-    uint8_t  addr;
-    uint8_t  func;
-    uint16_t reg;  // Big endian
-    uint16_t num;  // Big endian
-    uint16_t crc;  // Little endian
+    uint8_t addr;
+    uint8_t func;
+    uint16_t reg; // Big endian
+    uint16_t num; // Big endian
+    uint16_t crc; // Little endian
 } bMB_RTU_ReadRegs_t;
 
 typedef struct
@@ -32,21 +32,21 @@ typedef struct
 
 typedef struct
 {
-    uint8_t  addr;
-    uint8_t  func;
-    uint16_t reg;  // Big endian
-    uint16_t num;  // Big endian
-    uint8_t  len;
-    uint8_t  param[1];
+    uint8_t addr;
+    uint8_t func;
+    uint16_t reg; // Big endian
+    uint16_t num; // Big endian
+    uint8_t len;
+    uint8_t param[1];
 } bMB_RTU_WriteRegs_t;
 
 typedef struct
 {
-    uint8_t  addr;
-    uint8_t  func;
-    uint16_t reg;  // Big endian
-    uint16_t num;  // Big endian
-    uint16_t crc;  // Little endian
+    uint8_t addr;
+    uint8_t func;
+    uint16_t reg; // Big endian
+    uint16_t num; // Big endian
+    uint16_t crc; // Little endian
 } bMB_RTU_WriteRegsAck_t;
 
 #pragma pack()
@@ -89,16 +89,15 @@ static const uint8_t aucCRCLo[] = {
     0x88, 0x48, 0x49, 0x89, 0x4B, 0x8B, 0x8A, 0x4A, 0x4E, 0x8E, 0x8F, 0x4F, 0x8D, 0x4D, 0x4C, 0x8C,
     0x44, 0x84, 0x85, 0x45, 0x87, 0x47, 0x46, 0x86, 0x82, 0x42, 0x43, 0x83, 0x41, 0x81, 0x80, 0x40};
 
-
 static uint16_t _bMBCRC16(uint8_t *pucFrame, uint16_t usLen)
 {
     uint8_t ucCRCHi = 0xFF;
     uint8_t ucCRCLo = 0xFF;
-    int     iIndex;
+    int iIndex;
 
     while (usLen--)
     {
-        iIndex  = ucCRCLo ^ *(pucFrame++);
+        iIndex = ucCRCLo ^ *(pucFrame++);
         ucCRCLo = (uint8_t)(ucCRCHi ^ aucCRCHi[iIndex]);
         ucCRCHi = aucCRCLo[iIndex];
     }
@@ -118,7 +117,7 @@ static int _bMB_CheckRTUReadACK(uint8_t *psrc, uint16_t len)
         return -1;
     }
 
-    uint16_t crc  = _bMBCRC16(psrc, sizeof(bMB_RTU_ReadRegsAck_t) - 1 + phead->len);
+    uint16_t crc = _bMBCRC16(psrc, sizeof(bMB_RTU_ReadRegsAck_t) - 1 + phead->len);
     uint16_t crc2 = ((uint16_t *)(psrc + sizeof(bMB_RTU_ReadRegsAck_t) - 1 + phead->len))[0];
     if (crc != crc2)
     {
@@ -138,7 +137,7 @@ static int _bMB_CheckRTUWriteACK(uint8_t *psrc, uint16_t len)
     {
         return -1;
     }
-    uint16_t crc  = _bMBCRC16(psrc, sizeof(bMB_RTU_WriteRegsAck_t) - 2);
+    uint16_t crc = _bMBCRC16(psrc, sizeof(bMB_RTU_WriteRegsAck_t) - 2);
     uint16_t crc2 = ((uint16_t *)(psrc + (sizeof(bMB_RTU_WriteRegsAck_t) - 2)))[0];
     if (crc != crc2)
     {
@@ -163,15 +162,15 @@ int bMB_ReadRegs(bModbusInstance_t *pModbusInstance, uint8_t addr, uint8_t func,
                  uint16_t num)
 {
     bMB_RTU_ReadRegs_t wd;
-    if (pModbusInstance == NULL)
+    if (pModbusInstance == NULL || pModbusInstance->f == NULL)
     {
         return -1;
     }
     wd.addr = addr;
     wd.func = func;
-    wd.reg  = L2B_B2L_16b(reg);
-    wd.num  = L2B_B2L_16b(num);
-    wd.crc  = _bMBCRC16((uint8_t *)&wd, sizeof(bMB_RTU_ReadRegs_t) - sizeof(wd.crc));
+    wd.reg = L2B_B2L_16b(reg);
+    wd.num = L2B_B2L_16b(num);
+    wd.crc = _bMBCRC16((uint8_t *)&wd, sizeof(bMB_RTU_ReadRegs_t) - sizeof(wd.crc));
     pModbusInstance->f((uint8_t *)&wd, sizeof(bMB_RTU_ReadRegs_t));
     return 0;
 }
@@ -191,24 +190,24 @@ int bMB_ReadRegs(bModbusInstance_t *pModbusInstance, uint8_t addr, uint8_t func,
 int bMB_WriteRegs(bModbusInstance_t *pModbusInstance, uint8_t addr, uint8_t func, uint16_t reg,
                   uint16_t num, uint16_t *reg_value)
 {
-    bMB_RTU_WriteRegs_t *phead   = (bMB_RTU_WriteRegs_t *)bMB_SendBuff;
-    int                  i       = 0;
-    uint16_t             tmp_len = 0;
-    if (pModbusInstance == NULL || reg_value == NULL)
+    bMB_RTU_WriteRegs_t *phead = (bMB_RTU_WriteRegs_t *)bMB_SendBuff;
+    int i = 0;
+    uint16_t tmp_len = 0;
+    if (pModbusInstance == NULL || reg_value == NULL || pModbusInstance->f == NULL)
     {
         return -1;
     }
     phead->addr = addr;
     phead->func = func;
-    phead->reg  = L2B_B2L_16b(reg);
-    phead->num  = L2B_B2L_16b(num);
-    phead->len  = num * 2;
+    phead->reg = L2B_B2L_16b(reg);
+    phead->num = L2B_B2L_16b(num);
+    phead->len = num * 2;
     memcpy(phead->param, (uint8_t *)reg_value, phead->len);
     for (i = 0; i < num; i++)
     {
         ((uint16_t *)phead->param)[i] = L2B_B2L_16b(((uint16_t *)phead->param)[i]);
     }
-    tmp_len                                 = sizeof(bMB_RTU_WriteRegs_t) - 1 + phead->len;
+    tmp_len = sizeof(bMB_RTU_WriteRegs_t) - 1 + phead->len;
     ((uint16_t *)&bMB_SendBuff[tmp_len])[0] = _bMBCRC16(bMB_SendBuff, tmp_len);
     pModbusInstance->f(bMB_SendBuff, tmp_len + 2);
     return 0;
@@ -216,20 +215,20 @@ int bMB_WriteRegs(bModbusInstance_t *pModbusInstance, uint8_t addr, uint8_t func
 
 int bMB_FeedReceivedData(bModbusInstance_t *pModbusInstance, uint8_t *pbuf, uint16_t len)
 {
-    bMB_SlaveDeviceData_t   _data;
-    int                     i      = 0;
-    int                     retval = -1;
-    bMB_RTU_ReadRegsAck_t * pr     = (bMB_RTU_ReadRegsAck_t *)pbuf;
-    bMB_RTU_WriteRegsAck_t *pw     = (bMB_RTU_WriteRegsAck_t *)pbuf;
-    if (pbuf == NULL)
+    bMB_SlaveDeviceData_t _data;
+    int i = 0;
+    int retval = -1;
+    bMB_RTU_ReadRegsAck_t *pr = (bMB_RTU_ReadRegsAck_t *)pbuf;
+    bMB_RTU_WriteRegsAck_t *pw = (bMB_RTU_WriteRegsAck_t *)pbuf;
+    if (pbuf == NULL || pModbusInstance == NULL || pModbusInstance->cb == NULL)
     {
         return -1;
     }
     if (_bMB_CheckRTUReadACK(pbuf, len) == 0)
     {
-        _data.type                      = 0;
-        _data.result.r_result.func      = pr->func;
-        _data.result.r_result.reg_num   = pr->len / 2;
+        _data.type = 0;
+        _data.result.r_result.func = pr->func;
+        _data.result.r_result.reg_num = pr->len / 2;
         _data.result.r_result.reg_value = (uint16_t *)pr->buf;
 
         for (i = 0; i < _data.result.r_result.reg_num; i++)
@@ -241,9 +240,9 @@ int bMB_FeedReceivedData(bModbusInstance_t *pModbusInstance, uint8_t *pbuf, uint
     }
     else if (_bMB_CheckRTUWriteACK(pbuf, len) == 0)
     {
-        _data.type                    = 1;
-        _data.result.w_result.func    = pw->func;
-        _data.result.w_result.reg     = L2B_B2L_16b(pw->reg);
+        _data.type = 1;
+        _data.result.w_result.func = pw->func;
+        _data.result.w_result.reg = L2B_B2L_16b(pw->reg);
         _data.result.w_result.reg_num = L2B_B2L_16b(pw->num);
         pModbusInstance->cb(&_data);
         retval = 0;
