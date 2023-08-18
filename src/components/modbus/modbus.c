@@ -4,8 +4,9 @@
  * 2023-07-30     rgw             first version
  */
 
-#include "modbus.h"
 #include "aft_sdk.h"
+#include "modbus.h"
+
 
 #define DBG_TAG "modbus"
 #define DBG_LVL DBG_LOG
