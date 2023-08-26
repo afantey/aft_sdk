@@ -4,17 +4,17 @@
  * {data}         rgw          first version
  */
 
-//SDK 内部不需要变动的宏定义
 #ifndef __SDK_DEF_H
 #define __SDK_DEF_H
 
-#include <stdio.h>
-#include <stdint.h>
+#include <math.h>
+#include <stdarg.h>
 #include <stdbool.h>
 #include <stddef.h>
-#include <stdarg.h>
-#include <string.h>
+#include <stdint.h>
+#include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <time.h>
 
 #ifdef __cplusplus

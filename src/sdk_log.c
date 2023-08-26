@@ -9,7 +9,7 @@
 #include "sdk_common.h"
 
 #ifndef SDK_LOG_BUF_LEN
-#define SDK_LOG_BUF_LEN 128
+#define SDK_LOG_BUF_LEN 256
 #endif
 
 static uint32_t id;
