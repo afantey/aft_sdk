@@ -25,6 +25,8 @@ int get_int_phys_from_hex(uint32_t hex, int offset, double factor);
 uint16_t get_hex16_from_float_phys(double phys, int offset, double factor);
 uint16_t get_hex16_from_int_phys(int phys, int offset, double factor);
 uint32_t get_hex32_from_float_phys(double phys, int offset, double factor);
+double calculate_slope(double x[], double y[], int data_size);
+int is_dispersion_within_range(double data[], int data_size, double range, double slope_limit);
 
 #ifdef __cplusplus
 }
