@@ -135,7 +135,7 @@ struct at_client
 };
 typedef struct at_client *at_client_t;
 
-
+void at_resp_set_info(struct at_resp *resp, size_t line_num);
 int at_client_init(at_client_t client, sdk_uart_t *uart_port, uint8_t *recv_line_buf, size_t recv_bufsz);
 void at_parser_start(at_client_t client);
 enum at_resp_parser_state at_parser(at_client_t client, struct at_resp *resp);

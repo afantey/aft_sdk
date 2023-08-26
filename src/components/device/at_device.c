@@ -13,6 +13,11 @@
 #define DBG_LVL DBG_LOG
 #include "sdk_log.h"
 
+void at_resp_set_info(struct at_resp *resp, size_t line_num)
+{
+    resp->line_num = line_num;
+}
+
 void at_obj_set_end_sign(at_client_t client, char ch)
 {
     if (client == NULL)
