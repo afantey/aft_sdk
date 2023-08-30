@@ -41,6 +41,9 @@ struct sdk_uart_ops
 
 struct _sdk_uart
 {
+    void *instance;
+    int32_t irq;
+    int32_t irq_prio;
     bool is_opened;
     uart_rx_fifo_t rx_fifo;
     sdk_os_mutex_t lock;
