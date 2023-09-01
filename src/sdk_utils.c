@@ -62,17 +62,17 @@ uint32_t utils_ntohl(uint32_t n)
 }
 
 /**
- * @brief ¼ÆËãÏßĞÔ»Ø¹éµÄĞ±ÂÊ
- * @param x xÖµÊı×é
- * @param y yÖµÊı×é
- * @param data_size Êı¾İÊı×é´óĞ¡
- * @return Ğ±ÂÊÖµ
+ * @brief è®¡ç®—çº¿æ€§å›å½’çš„æ–œç‡
+ * @param x xå€¼æ•°ç»„
+ * @param y yå€¼æ•°ç»„
+ * @param data_size æ•°æ®æ•°ç»„å¤§å°
+ * @return æ–œç‡å€¼
  */
 double calculate_slope(double x[], double y[], int data_size)
 {
     double sum_x = 0.0, sum_y = 0.0, sum_xy = 0.0, sum_x2 = 0.0;
 
-    // ¼ÆËãÀÛ¼ÓºÍ
+    // è®¡ç®—ç´¯åŠ å’Œ
     for (int i = 0; i < data_size; i++)
     {
         sum_x += x[i];
@@ -81,32 +81,32 @@ double calculate_slope(double x[], double y[], int data_size)
         sum_x2 += x[i] * x[i];
     }
 
-    // ¼ÆËãĞ±ÂÊµÄ·Ö×ÓºÍ·ÖÄ¸
+    // è®¡ç®—æ–œç‡çš„åˆ†å­å’Œåˆ†æ¯
     double numerator = (data_size * sum_xy) - (sum_x * sum_y);
     double denominator = (data_size * sum_x2) - (sum_x * sum_x);
 
-    // ¼ÆËãĞ±ÂÊ²¢·µ»Ø
+    // è®¡ç®—æ–œç‡å¹¶è¿”å›
     return numerator / denominator;
 }
 
 /**
- * @brief ÅĞ¶ÏÊı¾İµÄÀëÉ¢³Ì¶ÈÊÇ·ñÔÚÖ¸¶¨·¶Î§ÄÚ
- * @param data Êı¾İÊı×é
- * @param data_size Êı¾İÊı×é´óĞ¡
- * @param range ÀëÉ¢³Ì¶È·¶Î§
- * @param slope_limit Ğ±ÂÊÏŞÖÆ
- * @return Èç¹ûÔÚ·¶Î§ÄÚ·µ»Ø1£¬·ñÔò·µ»Ø0
+ * @brief åˆ¤æ–­æ•°æ®çš„ç¦»æ•£ç¨‹åº¦æ˜¯å¦åœ¨æŒ‡å®šèŒƒå›´å†…
+ * @param data æ•°æ®æ•°ç»„
+ * @param data_size æ•°æ®æ•°ç»„å¤§å°
+ * @param range ç¦»æ•£ç¨‹åº¦èŒƒå›´
+ * @param slope_limit æ–œç‡é™åˆ¶
+ * @return å¦‚æœåœ¨èŒƒå›´å†…è¿”å›1ï¼Œå¦åˆ™è¿”å›0
  */
 int is_dispersion_within_range(double data[], int data_size, double range, double slope_limit)
 {
-    // ¹¹Ôì x Êı×é£¬¼ÙÉè x ÊÇ [0, 1, 2, ...]
+    // æ„é€  x æ•°ç»„ï¼Œå‡è®¾ x æ˜¯ [0, 1, 2, ...]
     double x[data_size];
     for (int i = 0; i < data_size; i++)
     {
         x[i] = (double)i;
     }
 
-    // ¼ÆËãÊı¾İµÄĞ±ÂÊ
+    // è®¡ç®—æ•°æ®çš„æ–œç‡
     double slope = calculate_slope(x, data, data_size);
 
     double sum = 0.0;
@@ -125,6 +125,6 @@ int is_dispersion_within_range(double data[], int data_size, double range, doubl
     double variance = squared_diff_sum / data_size;
     double standard_deviation = sqrtf(variance);
 
-    // ÅĞ¶ÏÊı¾İµÄÀëÉ¢³Ì¶ÈºÍĞ±ÂÊÊÇ·ñÔÚÏŞÖÆ·¶Î§ÄÚ
+    // åˆ¤æ–­æ•°æ®çš„ç¦»æ•£ç¨‹åº¦å’Œæ–œç‡æ˜¯å¦åœ¨é™åˆ¶èŒƒå›´å†…
     return standard_deviation <= range && fabs(slope) <= slope_limit;
 }
