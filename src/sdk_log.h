@@ -15,10 +15,11 @@ void sdklog(char *level, char *module, const char *format, ...);
 void sdklog_hexdump(uint32_t width, uint8_t *buf, uint32_t len);
 
 /* DEBUG level */
-#define DBG_ERROR           0
-#define DBG_WARNING         1
-#define DBG_INFO            2
-#define DBG_LOG             3
+#define DBG_NONE            0
+#define DBG_ERROR           1
+#define DBG_WARNING         2
+#define DBG_INFO            3
+#define DBG_LOG             4
 
 #ifdef DBG_TAG
 #ifndef DBG_SECTION_NAME
@@ -38,7 +39,7 @@ void sdklog_hexdump(uint32_t width, uint8_t *buf, uint32_t len);
 #else
 /* compatible with old version */
 #ifndef DBG_LEVEL
-#define DBG_LEVEL         DBG_WARNING
+#define DBG_LEVEL         DBG_NONE
 #endif
 #endif /* DBG_LVL */
 
@@ -67,11 +68,19 @@ void sdklog_hexdump(uint32_t width, uint8_t *buf, uint32_t len);
 #define LOG_E(...)
 #endif
 
+#if (DBG_LEVEL > DBG_NONE)
 #define LOG_HEX(width, buf, size) sdklog_hexdump(width, buf, size)
+#else
+#define LOG_HEX(...)
+#endif
 
 #define sdk_printf(...) printf(__VA_ARGS__)
 
+#if (DBG_LEVEL > DBG_NONE)
 #define LOG_RAW(...)    sdk_printf(__VA_ARGS__)
+#else
+#define LOG_RAW(...)
+#endif
 
 #ifdef __cplusplus
 }
