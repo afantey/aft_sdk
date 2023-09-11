@@ -39,9 +39,18 @@ struct sdk_uart_ops
     int32_t (*control)(sdk_uart_t *uart, int32_t cmd, void *args);
 };
 
+struct sdk_uart_settings
+{
+    int32_t baudrate;
+    int32_t data_bit;
+    char parity;
+    int32_t stop_bit;
+};
+
 struct _sdk_uart
 {
     void *instance;
+    struct sdk_uart_settings settings;
     int32_t irq;
     int32_t irq_prio;
     bool is_opened;
