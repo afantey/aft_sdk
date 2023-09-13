@@ -4,9 +4,9 @@
  * 2022-12-28     rgw             first version
  */
 
-#include <time.h>
-#include "sdk_rtc.h"
 #include "aft_sdk.h"
+#include "sdk_rtc.h"
+#include "sdk_board.h"
 
 extern sdk_rtc_t rtc;
 time_t time (time_t *_timer)
@@ -33,8 +33,7 @@ time_t time (time_t *_timer)
     return time_dat;
 }
 
-extern volatile uint32_t systicks;
 clock_t clock(void)
 {
-    return (clock_t)systicks;
+    return (clock_t)sdk_hw_get_systick();
 }

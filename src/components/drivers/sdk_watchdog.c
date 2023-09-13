@@ -22,7 +22,7 @@ sdk_err_t sdk_watchdog_open(sdk_watchdog_t *wdt)
 
 sdk_err_t sdk_watchdog_close(sdk_watchdog_t *wdt)
 {
-    if (wdt->ops.control(wdt, SDK_DRIVER_WDT_STOP, NULL) != SDK_OK)
+    if (wdt->ops.control(wdt, SDK_CONTROL_WDT_STOP, NULL) != SDK_OK)
     {
         LOG_W(" This watchdog can not be stoped\n");
 

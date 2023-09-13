@@ -100,29 +100,30 @@ typedef union
 #define SDK_E_INVALID 5 /**< Invalid argument */
 
 /* driver definitions */
-#define SDK_CONTROL_UART_DISABLE_INT      0 /**< Disable interrupt */
-#define SDK_CONTROL_UART_ENABLE_INT       1 /**< Enable interrupt */
-#define SDK_CONTROL_UART_ENABLE_DMA       2 /**< Enable DMA */
-#define SDK_CONTROL_UART_INT_IDLE_ENABLE  3 // recv idle interrupt
-#define SDK_CONTROL_UART_INT_IDLE_DISABLE 4
-#define SDK_CONTROL_UART_INT_RTO_ENABLE   5 // recv timeout interrupt
-#define SDK_CONTROL_UART_INT_RTO_DISABLE  6
-#define SDK_CONTROL_UART_GET_DMA_CNT      7
-#define SDK_CONTROL_UART_ENABLE_RX        8
-#define SDK_CONTROL_UART_DISABLE_RX       9
+#define SDK_CONTROL_UART_DISABLE_INT      (0) /**< Disable interrupt */
+#define SDK_CONTROL_UART_ENABLE_INT       (1) /**< Enable interrupt */
+#define SDK_CONTROL_UART_ENABLE_DMA       (2) /**< Enable DMA */
+#define SDK_CONTROL_UART_INT_IDLE_ENABLE  (3) /**< Enable idle interrupt */
+#define SDK_CONTROL_UART_INT_IDLE_DISABLE (4) /**< Disable idle interrupt */
+#define SDK_CONTROL_UART_INT_RTO_ENABLE   (5) /**< Enable receive timeout interrupt */
+#define SDK_CONTROL_UART_INT_RTO_DISABLE  (6) /**< Disable receive timeout interrupt */
+#define SDK_CONTROL_UART_GET_DMA_CNT      (7) /**< Get DMA count */
+#define SDK_CONTROL_UART_ENABLE_RX        (8) /**< Enable RX */
+#define SDK_CONTROL_UART_DISABLE_RX       (9) /**< Disable RX */
 
-#define SDK_CONTROL_RTC_GET_TIME   0 /**< Get time */
-#define SDK_CONTROL_RTC_SET_TIME   1 /**< Set time */
-#define SDK_CONTROL_RTC_GET_ALARM  2 /**< Get alarm */
-#define SDK_CONTROL_RTC_SET_ALARM  3 /**< Set alarm */
-#define SDK_CONTROL_RTC_SET_WAKEUP 4
+#define SDK_CONTROL_RTC_GET_TIME      (0) /**< Get time */
+#define SDK_CONTROL_RTC_SET_TIME      (1) /**< Set time */
+#define SDK_CONTROL_RTC_GET_ALARM     (2) /**< Get alarm */
+#define SDK_CONTROL_RTC_SET_ALARM     (3) /**< Set alarm */
+#define SDK_CONTROL_RTC_SET_WAKEUP    (4) /**< Set wakeup */
+#define SDK_CONTROL_RTC_SET_WAKEUP_MS (5) /**< Set wakeup in ms */
 
-#define SDK_DRIVER_WDT_GET_TIMEOUT    (1) /* get timeout(in seconds) */
-#define SDK_DRIVER_WDT_SET_TIMEOUT    (2) /* set timeout(in seconds) */
-#define SDK_DRIVER_WDT_GET_TIMELEFT   (3) /* get the left time before reboot(in seconds) */
-#define SDK_DRIVER_WDT_KEEPALIVE      (4) /* refresh watchdog */
-#define SDK_DRIVER_WDT_START          (5) /* start watchdog */
-#define SDK_DRIVER_WDT_STOP           (6) /* stop watchdog */
+#define SDK_CONTROL_WDT_GET_TIMEOUT    (1) /* get timeout(in seconds) */
+#define SDK_CONTROL_WDT_SET_TIMEOUT    (2) /* set timeout(in seconds) */
+#define SDK_CONTROL_WDT_GET_TIMELEFT   (3) /* get the left time before reboot(in seconds) */
+#define SDK_CONTROL_WDT_KEEPALIVE      (4) /* refresh watchdog */
+#define SDK_CONTROL_WDT_START          (5) /* start watchdog */
+#define SDK_CONTROL_WDT_STOP           (6) /* stop watchdog */
 
 #ifdef __cplusplus
 }
