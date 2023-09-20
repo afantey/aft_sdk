@@ -10,11 +10,11 @@
 #define DBG_LVL DBG_LOG
 #include "sdk_log.h"
 
-sdk_err_t sdk_watchdog_open(sdk_watchdog_t *wdt)
+sdk_err_t sdk_watchdog_open(sdk_watchdog_t *wdt, uint32_t timeout_s)
 {
     if (wdt->ops.open)
     {
-        return (wdt->ops.open(wdt));
+        return (wdt->ops.open(wdt, timeout_s));
     }
 
     return (-SDK_ERROR);

@@ -14,7 +14,7 @@ typedef struct sdk_watchdog_device sdk_watchdog_t;
 
 struct sdk_watchdog_ops
 {
-    sdk_err_t (*open)(sdk_watchdog_t *wdt);
+    sdk_err_t (*open)(sdk_watchdog_t *wdt, uint32_t timeout_s);
     sdk_err_t (*control)(sdk_watchdog_t *wdt, int cmd, void *arg);
 };
 
@@ -25,7 +25,7 @@ struct sdk_watchdog_device
     struct sdk_watchdog_ops ops;
 };
 
-sdk_err_t sdk_watchdog_open(sdk_watchdog_t *wdt);
+sdk_err_t sdk_watchdog_open(sdk_watchdog_t *wdt, uint32_t timeout_s);
 sdk_err_t sdk_watchdog_close(sdk_watchdog_t *wdt);
 sdk_err_t sdk_watchdog_control(sdk_watchdog_t *wdt, int cmd, void *args);
 
