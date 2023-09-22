@@ -10,14 +10,14 @@
 
 void sdk_uart_open(sdk_uart_t *uart, int32_t baudrate, int32_t data_bit, char parity, int32_t stop_bit)
 {
-    uart->is_opened = true;
     uart->ops.open(uart, baudrate, data_bit, parity, stop_bit);
+    uart->is_opened = true;
 }
 
 void sdk_uart_close(sdk_uart_t *uart)
 {
-    uart->is_opened = false;
     uart->ops.close(uart);
+    uart->is_opened = false;
 }
 
 int32_t sdk_uart_write(sdk_uart_t *uart, const uint8_t *data, int32_t len)
