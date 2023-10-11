@@ -33,6 +33,22 @@ extern "C" {
 #define SDK_VERSION_CHECK(major, minor, revise) ((major * 10000) + \
                                                  (minor * 100) + revise)
 
+#ifndef __WEAK
+#ifdef __CC_ARM
+  #define __WEAK                                 __attribute__((weak))
+#elif defined (__ARMCC_VERSION) && (__ARMCC_VERSION >= 6010050)
+  #define __WEAK                                 __attribute__((weak))
+#elif defined(__ICCARM__)
+  #if __ICCARM_V8
+    #define __WEAK __attribute__((weak))
+  #else
+    #define __WEAK _Pragma("__weak")
+  #endif
+#elif defined(__GNUC__)
+  #define __WEAK                                 __attribute__((weak))
+#endif
+#endif
+
 /* Define one bit mask */
 #ifndef BIT0
 #define BIT0     (0x00000001UL)       ///< Bit 0 mask of an 32 bit integer
