@@ -33,7 +33,7 @@ static void vsdklog(char *level, char *module, const char *format, va_list ap)
     unsigned int milliseconds = uptime_ms % 1000;
 #endif
     len = snprintf(buf, SDK_LOG_BUF_LEN, "%04d %02d:%02d:%02d.%04d <%d> %s %s ", days, hours, minutes, seconds, milliseconds, id, level, module);
-    // len = snprintf(buf, BUFLEN, "%s %s <%d> ", level, module, id);
+//    len = snprintf(buf, SDK_LOG_BUF_LEN, "%s %s <%d> ", level, module, id);
     id++;
     len += vsnprintf(buf + len, SDK_LOG_BUF_LEN - len, format, ap);
 

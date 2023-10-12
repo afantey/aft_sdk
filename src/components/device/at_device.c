@@ -4,8 +4,6 @@
  * 2023-06-26     rgw             first version
  */
 
-#include "sdk_config.h"
-#include "sdk_def.h"
 #include "sdk_board.h"
 #include "at_device.h"
 
@@ -178,7 +176,7 @@ void at_parser_start(at_client_t client)
 enum at_resp_parser_state at_parser(at_client_t client, struct at_resp *resp)
 {
     const struct at_urc *urc;
-    enum at_resp_rl_state resp_state;
+//    enum at_resp_rl_state resp_state;
     switch (resp->parser_state)
     {
     case AT_RESP_PARSER_STAT_START:
@@ -271,7 +269,7 @@ enum at_resp_parser_state at_parser(at_client_t client, struct at_resp *resp)
 int at_client_init(at_client_t client, sdk_uart_t *uart_port, uint8_t *recv_line_buf, size_t recv_bufsz)
 {
     int result = SDK_OK;
-    sdk_err_t open_result = SDK_OK;
+//    sdk_err_t open_result = SDK_OK;
 
     client->uart_port = uart_port;
     client->recv_line_buf = (char *)recv_line_buf;
