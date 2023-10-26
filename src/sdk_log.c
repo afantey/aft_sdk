@@ -34,13 +34,18 @@ static void vsdklog(char *level, char *module, const char *format, va_list ap)
 #endif
     len = snprintf(buf, SDK_LOG_BUF_LEN, "%04d %02d:%02d:%02d.%04d <%d> %s %s ", days, hours, minutes, seconds, milliseconds, id, level, module);
 //    len = snprintf(buf, SDK_LOG_BUF_LEN, "%s %s <%d> ", level, module, id);
+    if(len >= SDK_LOG_BUF_LEN)
+    {
+        sdk_hw_console_output("log buf overflow, please check SDK_LOG_BUF_LEN, system halt\r\n");
+        while(1);
+    }
     id++;
     len += vsnprintf(buf + len, SDK_LOG_BUF_LEN - len, format, ap);
 
     if (len > SDK_LOG_BUF_LEN - 2)
         len = SDK_LOG_BUF_LEN - 2;
     buf[len++] = '\n';
-		buf[len++] = '\0';
+    buf[len++] = '\0';
 
     sdk_hw_console_output(buf);
 }

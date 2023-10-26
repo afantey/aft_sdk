@@ -425,7 +425,12 @@ at_resp_status_t at_cmd_common(struct at_client *client, char *format, ...)
     va_start(va, format);
     n = vsnprintf(cmd_str, sizeof(cmd_str) - 1, format, va);
     va_end(va);
-            
+
+    if (n > AT_CMD_MAX_LEN)
+    {
+        LOG_E("AT cmd len is out of range!");
+    }
+
     enum at_cmd_state cmd_state = AT_CMD_SEND(client, 0, 5000, cmd_str, n);
     if(cmd_state == AT_CMD_STAT_REVOK)
     {
@@ -456,7 +461,12 @@ at_resp_status_t at_cmd_common_ex(struct at_client *client, int retry, int timeo
         va_start(va, format);
         n = vsnprintf(cmd_str, sizeof(cmd_str) - 1, format, va);
         va_end(va);
-                
+
+        if (n > AT_CMD_MAX_LEN)
+        {
+            LOG_E("AT cmd len is out of range!");
+        }
+
         enum at_cmd_state cmd_state = AT_CMD_SEND(client, retry, timeout_ms, cmd_str, n);
         if (cmd_state == AT_CMD_STAT_REVOK)
         {
