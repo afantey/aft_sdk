@@ -27,6 +27,8 @@ uint16_t get_hex16_from_int_phys(int phys, int offset, double factor);
 uint32_t get_hex32_from_float_phys(double phys, int offset, double factor);
 double calculate_slope(double x[], double y[], int data_size);
 int is_dispersion_within_range(double data[], int data_size, double range, double slope_limit);
+int32_t utils_hex2str(uint8_t *input, int input_len, char *output, int output_len);
+int32_t utils_str2hex(char *input, int input_len, uint8_t *output, int output_len);
 
 #ifdef __cplusplus
 }

@@ -128,3 +128,67 @@ int is_dispersion_within_range(double data[], int data_size, double range, doubl
     // 判断数据的离散程度和斜率是否在限制范围内
     return standard_deviation <= range && fabs(slope) <= slope_limit;
 }
+
+int32_t utils_hex2str(uint8_t *input, int input_len, char *output, int output_len)
+{
+    int i = 0, j = 0;
+    uint8_t tmp = 0;
+
+    if (output_len < input_len * 2 + 1) {
+        return -1;
+    }
+
+    for (i = 0; i < input_len; i++) {
+        tmp = input[i] >> 4;
+        if (tmp <= 9) {
+            output[j] = tmp + '0';
+        } else if (tmp >= 10 && tmp <= 15) {
+            output[j] = tmp - 10 + 'A';
+        } else {
+            return -1;
+        }
+        j++;
+
+        tmp = input[i] & 0x0f;
+        if (tmp <= 9) {
+            output[j] = tmp + '0';
+        } else if (tmp >= 10 && tmp <= 15) {
+            output[j] = tmp - 10 + 'A';
+        } else {
+            return -1;
+        }
+        j++;
+    }
+    output[j] = '\0';
+    return 0;
+}
+
+int32_t utils_str2hex(char *input, int input_len, uint8_t *output, int output_len)
+{
+    int i = 0, j = 0;
+    uint8_t tmp = 0;
+
+    if (output_len < input_len / 2) {
+        return -1;
+    }
+
+    for (i = 0; i < input_len; i++) {
+        if (input[i] >= '0' && input[i] <= '9') {
+            tmp = input[i] - '0';
+        } else if (input[i] >= 'A' && input[i] <= 'F') {
+            tmp = input[i] - 'A' + 10;
+        } else if (input[i] >= 'a' && input[i] <= 'f') {
+            tmp = input[i] - 'a' + 10;
+        } else {
+            return -1;
+        }
+
+        if (i % 2 == 0) {
+            output[j] = tmp << 4;
+        } else {
+            output[j] |= tmp;
+            j++;
+        }
+    }
+    return 0;
+}
