@@ -30,6 +30,7 @@ enum at_cmd_state
     AT_CMD_STAT_START,
     AT_CMD_STAT_SEND,
     AT_CMD_STAT_WAIT_REV,
+    AT_CMD_STAT_WAIT_SEND,
     AT_CMD_STAT_RETRY,
     AT_CMD_STAT_REVOK,
     AT_CMD_STAT_TIMEOUT
@@ -37,13 +38,10 @@ enum at_cmd_state
 
 struct at_cmd
 {
-    enum at_cmd_state state;
-    int trycnt;
-    struct swtimer timer_wait_recv;
-
+    enum at_cmd_state state_common;
     enum at_cmd_state state_send;
     int trycnt_send;
-    struct swtimer timer_send;
+    struct swtimer timer_send_wait;
 };
 
 enum at_resp_rl_state
@@ -125,27 +123,25 @@ struct at_client
     /* The length of the currently received one line data */
     size_t recv_line_len;
     /* The maximum supported receive data length */
-    size_t recv_bufsz;
+    size_t line_bufsz;
     sdk_os_mutex_t lock;
 
     struct at_urc_table urc_table;
 
     struct at_cmd *cmd;
     struct at_resp *resp;
+    struct sdk_os_semaphore resp_notice;
 };
 typedef struct at_client *at_client_t;
 
 void at_resp_set_info(struct at_resp *resp, size_t line_num);
-int at_client_init(at_client_t client, sdk_uart_t *uart_port, uint8_t *recv_line_buf, size_t recv_bufsz);
-void at_parser_start(at_client_t client);
-enum at_resp_parser_state at_parser(at_client_t client, struct at_resp *resp);
-enum at_cmd_state at_parser_wait_resp(struct at_client *client, int timeout_s);
+int at_client_init(at_client_t client, sdk_uart_t *uart_port, uint8_t *recv_line_buf, size_t line_bufsz);
+void at_parser_poll(struct at_client *client);
 void at_obj_set_end_sign(at_client_t client, char ch);
 void at_obj_set_urc_table(at_client_t client, const struct at_urc *urc_table, size_t table_sz);
 int at_resp_parse_line_args_by_kw(struct at_resp *resp, const char *keyword, const char *resp_expr, ...);
 at_resp_status_t at_cmd_common(struct at_client *client, char *format, ...);
 at_resp_status_t at_cmd_common_ex(struct at_client *client, int retry, int timeout_ms, at_resp_status_t (*parse_func)(struct at_resp *resp), char *format, ...);
-enum at_cmd_state AT_DATA_SEND(struct at_client *client, int timeout_ms, uint8_t *data, int data_len);
 
 
 #ifdef __cplusplus

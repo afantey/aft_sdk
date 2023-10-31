@@ -18,10 +18,30 @@ extern "C" {
 #endif
 
 typedef void* sdk_os_task_t;
-typedef void* sdk_os_semaphore_t;
 typedef void* sdk_os_mutex_t;
 
+// ----------------------------------------------------------------------------
+// SEMAPHORE
+// ----------------------------------------------------------------------------
+enum sdk_os_sem_state
+{
+    SEM_STATE_START,
+    SEM_STATE_WAITING,
+    SEM_STATE_TIMEOUT,
+};
 
+struct sdk_os_semaphore
+{
+    enum sdk_os_sem_state state;
+    struct swtimer timer;
+    uint16_t value;
+};
+typedef struct sdk_os_semaphore *sdk_os_sem_t;
+
+sdk_err_t sdk_os_sem_init(sdk_os_sem_t sem, int32_t count);
+sdk_err_t sdk_os_sem_delete(sdk_os_sem_t sem);
+sdk_err_t sdk_os_sem_take(sdk_os_sem_t sem, int32_t timeout);
+sdk_err_t sdk_os_sem_release(sdk_os_sem_t sem);
 
 // ----------------------------------------------------------------------------
 // EVENT
@@ -45,8 +65,8 @@ struct sdk_os_event
 };
 typedef struct sdk_os_event *sdk_os_event_t;
 
-sdk_err_t sdk_os_event_create(sdk_os_event_t event);
-void sdk_os_event_delete(sdk_os_event_t event);
+sdk_err_t sdk_os_event_init(sdk_os_event_t event);
+sdk_err_t sdk_os_event_delete(sdk_os_event_t event);
 sdk_err_t sdk_os_event_send(sdk_os_event_t event, uint32_t set);
 sdk_err_t sdk_os_event_recv(sdk_os_event_t event, uint32_t set, uint8_t option, int32_t timeout, uint32_t *recved);
 

@@ -39,7 +39,7 @@ void sdk_os_delay_ms(int delay_ms)
     k_msleep(delay_ms);
 }
 
-bool sdk_os_event_create(sdk_os_event_t event)
+bool sdk_os_event_init(sdk_os_event_t event)
 {
    return true;
 }

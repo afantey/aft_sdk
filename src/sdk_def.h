@@ -49,6 +49,9 @@ extern "C" {
 #endif
 #endif
 
+/* Define assert */
+#define SDK_ASSERT(EX)
+
 /* Define one bit mask */
 #ifndef BIT0
 #define BIT0     (0x00000001UL)       ///< Bit 0 mask of an 32 bit integer

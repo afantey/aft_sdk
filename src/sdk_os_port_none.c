@@ -35,15 +35,18 @@ void sdk_os_delay_ms(int delay_ms)
     sdk_hw_ms_delay(delay_ms);
 }
 
-sdk_err_t sdk_os_event_create(sdk_os_event_t event)
+sdk_err_t sdk_os_event_init(sdk_os_event_t event)
 {
     event->state = EVENT_STATE_START;
     event->set = 0;
     return SDK_OK;
 }
 
-void sdk_os_event_delete(sdk_os_event_t event)
+sdk_err_t sdk_os_event_delete(sdk_os_event_t event)
 {
+    event->state = EVENT_STATE_START;
+    event->set = 0;
+    return SDK_OK;
 }
 
 sdk_err_t sdk_os_event_send(sdk_os_event_t event, uint32_t set)
@@ -117,22 +120,80 @@ sdk_err_t sdk_os_event_recv(sdk_os_event_t event, uint32_t set, uint8_t option, 
     return status;
 }
 
-bool sdk_os_semaphore_create(sdk_os_semaphore_t semaphore, int32_t count)
+sdk_err_t sdk_os_sem_init(sdk_os_sem_t sem, int32_t count)
 {
-    return true;
+    sem->value = count;
+    sem->state = SEM_STATE_START;
+    return SDK_OK;
 }
 
-void sdk_os_semaphore_delete(sdk_os_semaphore_t semaphore)
+sdk_err_t sdk_os_sem_delete(sdk_os_sem_t sem)
 {
+    sem->value = 0;
+    sem->state = SEM_STATE_START;
+    return SDK_OK;
 }
 
-bool sdk_os_semaphore_take(sdk_os_semaphore_t semaphore, int32_t timeout)
+sdk_err_t sdk_os_sem_take(sdk_os_sem_t sem, int32_t timeout)
 {
-    return true;
+    sdk_err_t status = -SDK_ERROR;
+
+    if (sem->value > 0)
+    {
+        sem->value --;
+        status = SDK_OK;
+        sem->state = SEM_STATE_START;
+    }
+    else
+    {
+        /* no waiting, return with timeout */
+        if (timeout == 0)
+        {
+            return -SDK_E_TIMEOUT;
+        }
+        else
+        {
+            /* has waiting time, start thread timer */
+            if (timeout > 0)
+            {
+                switch (sem->state)
+                {
+                case SEM_STATE_START:
+                    swtimer_set(&sem->timer, timeout);
+                    sem->state = SEM_STATE_WAITING;
+                    status = -SDK_E_BUSY;
+                    break;
+                case SEM_STATE_WAITING:
+                    if(swtimer_expired(&sem->timer))
+                    {
+                        sem->state = SEM_STATE_TIMEOUT;
+                    }
+                    status = -SDK_E_BUSY;
+                    break;
+                case SEM_STATE_TIMEOUT:
+                    sem->state = SEM_STATE_START;
+                    status = -SDK_E_TIMEOUT;
+                default:
+                    break;
+                }
+            }
+        }
+    }
+
+    return status;
 }
 
-void sdk_os_semaphore_release(sdk_os_semaphore_t semaphore)
+sdk_err_t sdk_os_sem_release(sdk_os_sem_t sem)
 {
+    if (sem->value < INT16_MAX)
+    {
+        sem->value++; /* increase value */
+    }
+    else
+    {
+        return -SDK_E_INVALID; /* value overflowed */
+    }
+    return SDK_OK;
 }
 
 sdk_os_mutex_t sdk_os_mutex_create(const char *name)
