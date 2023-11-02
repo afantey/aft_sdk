@@ -11,6 +11,25 @@
 #define DBG_LVL DBG_LOG
 #include "sdk_log.h"
 
+// #define AT_SEND_CMD(client, retry, timeout_ms, parse_fun, ...)                                                     \
+//     do                                                                                                             \
+//     {                                                                                                              \
+//         at_resp_status_t __status = at_cmd_common_ex((client), (retry), (timeout_ms), (parse_fun), (__VA_ARGS__)); \
+//         if (__status == AT_RESP_OK)                                                                                \
+//         {                                                                                                          \
+//             status = __status;                                                                                     \
+//         }                                                                                                          \
+//         else if (__status == AT_RESP_WAITING)                                                                      \
+//         {                                                                                                          \
+//             return;                                                                                                \
+//         }                                                                                                          \
+//         else if (__status < 0)                                                                                     \
+//         {                                                                                                          \
+//             status = __status;                                                                                     \
+//             goto __exit;                                                                                           \
+//         }                                                                                                          \
+//     } while (0)
+
 void at_resp_set_info(struct at_resp *resp, size_t line_num)
 {
     resp->line_num = line_num;
@@ -233,6 +252,9 @@ static enum at_resp_parser_state at_parser(at_client_t client, struct at_resp *r
             else
             {
                 resp->resp_status = AT_RESP_BUFF_FULL;
+                memset(resp->buf, 0x00, resp->buf_size);
+                resp->buf_len = 0;
+                resp->line_counts = 0;
                 LOG_E("Read response buffer failed. The Response buffer size is out of buffer size(%d)!", resp->buf_size);
             }
             /* check response result */
@@ -263,8 +285,8 @@ static enum at_resp_parser_state at_parser(at_client_t client, struct at_resp *r
             }
         }
 
-        resp->parser_state = AT_RESP_PARSER_STAT_PARSE_OK;
         sdk_os_sem_release(&client->resp_notice);
+        resp->parser_state = AT_RESP_PARSER_STAT_PARSE_OK;
         break;
     case AT_RESP_PARSER_STAT_PARSE_OK:
         resp->parser_state = AT_RESP_PARSER_STAT_START;
@@ -331,7 +353,11 @@ static enum at_cmd_state AT_CMD_SEND(struct at_client *client, int timeout_ms, c
         break;
     case AT_CMD_STAT_SEND:
     {
-        LOG_RAW("%s", cmd_str);
+        // LOG_RAW("%s", cmd_str);
+        for(int i = 0; i < cmd_len; i++)
+        {
+            LOG_RAW("%c", cmd_str[i]);
+        }
         sdk_os_sem_init(&client->resp_notice, 0);
         sdk_uart_write(client->uart_port, (uint8_t *)cmd_str, cmd_len);
         cmd->state_send = AT_CMD_STAT_WAIT_REV;
