@@ -181,6 +181,7 @@ static enum at_resp_rl_state at_recv_readline(at_client_t client, struct at_resp
     case AT_RESP_RL_STAT_BUFF_FULL:
         break;
     default:
+        LOG_E("AT response read line state error! state %d", resp->rl_state);
         break;
     }
 
@@ -292,6 +293,7 @@ static enum at_resp_parser_state at_parser(at_client_t client, struct at_resp *r
         resp->parser_state = AT_RESP_PARSER_STAT_START;
         break;
     default:
+        LOG_E("AT response parser state error! state %d", resp->parser_state);
         break;
     }
 
@@ -383,7 +385,9 @@ static enum at_cmd_state AT_CMD_SEND(struct at_client *client, int timeout_ms, c
     case AT_CMD_STAT_REVOK:
     case AT_CMD_STAT_TIMEOUT:
         cmd->state_send = AT_CMD_STAT_START;
+        break;
     default:
+        LOG_E("AT cmd state error! state %d", cmd->state_send);
         break;
     }
     return cmd->state_send;
@@ -505,6 +509,7 @@ at_resp_status_t at_cmd_common_ex(struct at_client *client, int retry, int timeo
         cmd->state_common = AT_CMD_STAT_START;
         break;
     default:
+        LOG_E("AT cmd state error! state %d", cmd->state_common);
         break;
     }
 
