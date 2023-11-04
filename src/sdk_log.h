@@ -74,10 +74,11 @@ void sdklog_hexdump(uint32_t width, uint8_t *buf, uint32_t len);
 #define LOG_HEX(...)
 #endif
 
-#define sdk_printf(...) printf(__VA_ARGS__)
+int sdk_printf(const char *format, ...);
 
 #if (DBG_LEVEL > DBG_NONE)
-#define LOG_RAW(...)    sdk_printf(__VA_ARGS__)
+#define LOG_RAW(...) sdk_printf(__VA_ARGS__)
+#define printf(...)  sdk_printf(__VA_ARGS__)
 #else
 #define LOG_RAW(...)
 #endif

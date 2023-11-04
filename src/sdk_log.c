@@ -76,8 +76,22 @@ void sdklog_hexdump(uint32_t width, uint8_t *buf, uint32_t len)
     sdk_hw_console_output(temp);
 }
 
-int fputc(int ch, FILE *f)
+int sdk_printf(const char *format, ...)
 {
-    sdk_hw_console_putc(ch);
-    return ch;
+    va_list ap;
+    char buf[SDK_LOG_BUF_LEN];
+    
+    va_start(ap, format);
+    int len = vsnprintf(buf, SDK_LOG_BUF_LEN, format, ap);
+    va_end(ap);
+
+    sdk_hw_console_output(buf);
+
+    return len;
 }
+
+// int fputc(int ch, FILE *f)
+// {
+//     sdk_hw_console_putc(ch);
+//     return ch;
+// }
