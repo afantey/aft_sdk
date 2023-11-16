@@ -7,6 +7,7 @@
 #ifndef __SDK_DEF_H
 #define __SDK_DEF_H
 
+#include <inttypes.h>
 #include <math.h>
 #include <stdarg.h>
 #include <stdbool.h>

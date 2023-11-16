@@ -89,7 +89,7 @@ struct at_resp
     /* the count of received response lines */
     size_t line_counts;
 
-    uint32_t urc_event;
+    struct sdk_os_event urc_event;
 
     at_resp_status_t resp_status;
 };
@@ -142,7 +142,7 @@ void at_obj_set_urc_table(at_client_t client, const struct at_urc *urc_table, si
 int at_resp_parse_line_args_by_kw(struct at_resp *resp, const char *keyword, const char *resp_expr, ...);
 at_resp_status_t at_cmd_common(struct at_client *client, char *format, ...);
 at_resp_status_t at_cmd_common_ex(struct at_client *client, int retry, int timeout_ms, at_resp_status_t (*parse_func)(struct at_resp *resp), char *format, ...);
-
+at_resp_status_t at_resp_get_ok(struct at_client *client, int timeout_ms);
 
 #ifdef __cplusplus
 }

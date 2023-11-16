@@ -344,6 +344,22 @@ __exit:
     return result;
 }
 
+at_resp_status_t at_resp_get_ok(struct at_client *client, int timeout_ms)
+{
+    at_resp_status_t status = AT_RESP_WAITING;
+    sdk_err_t result = sdk_os_sem_take(&client->resp_notice, timeout_ms);
+    if (result == SDK_OK)
+    {
+        status = client->resp->resp_status;
+    }
+    else if (result == -SDK_E_TIMEOUT)
+    {
+        status = AT_RESP_TIMEOUT;
+    }
+
+    return status;
+}
+
 static enum at_cmd_state AT_CMD_SEND(struct at_client *client, int timeout_ms, char *cmd_str, int cmd_len)
 {
     struct at_cmd *cmd = client->cmd;
@@ -407,7 +423,7 @@ at_resp_status_t at_cmd_common(struct at_client *client, char *format, ...)
 
     if (cmd_len > AT_CMD_MAX_LEN)
     {
-        LOG_E("AT cmd len is out of range!");
+        LOG_E("AT cmd len(%d) is out of range(%d)!", cmd_len, AT_CMD_MAX_LEN);
     }
 
     enum at_cmd_state state_send = AT_CMD_SEND(client, 5000, cmd_str, cmd_len);
@@ -443,7 +459,7 @@ at_resp_status_t at_cmd_common_ex(struct at_client *client, int retry, int timeo
 
         if (cmd_len > AT_CMD_MAX_LEN)
         {
-            LOG_E("AT cmd len is out of range!");
+            LOG_E("AT cmd len(%d) is out of range(%d)!", cmd_len, AT_CMD_MAX_LEN);
         }
 
         enum at_cmd_state state_send = AT_CMD_SEND(client, timeout_ms, cmd_str, cmd_len);

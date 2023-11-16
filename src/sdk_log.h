@@ -7,6 +7,8 @@
 #ifndef __SDK_LOG_H
 #define __SDK_LOG_H
 
+#include <stdint.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
