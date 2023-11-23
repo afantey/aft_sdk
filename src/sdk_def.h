@@ -137,6 +137,7 @@ typedef union
 #define SDK_CONTROL_RTC_SET_ALARM     (3) /**< Set alarm */
 #define SDK_CONTROL_RTC_SET_WAKEUP    (4) /**< Set wakeup */
 #define SDK_CONTROL_RTC_SET_WAKEUP_MS (5) /**< Set wakeup in ms */
+#define SDK_CONTROL_RTC_CALIBRATION   (6) /**< Calibration */
 
 #define SDK_CONTROL_WDT_GET_TIMEOUT    (1) /* get timeout(in seconds) */
 #define SDK_CONTROL_WDT_SET_TIMEOUT    (2) /* set timeout(in seconds) */
