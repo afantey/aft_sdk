@@ -130,7 +130,7 @@ void at_resp_set_info(struct at_resp *resp, size_t line_num);
 int at_client_init(struct at_client *client, sdk_uart_t *uart_port, uint8_t *recv_line_buf, size_t line_bufsz);
 void at_parser_poll(struct at_client *client);
 void at_obj_set_end_sign(struct at_client *client, char ch);
-void at_obj_set_urc_table(struct at_client *client, const struct at_urc *urc_table, size_t table_sz);
+void at_obj_set_urc_table(struct at_client *client, struct at_urc *urc_table, size_t table_sz);
 int at_resp_parse_line_args_by_kw(struct at_resp *resp, const char *keyword, const char *resp_expr, ...);
 at_resp_status_t at_cmd_common(struct at_client *client, char *format, ...);
 at_resp_status_t at_cmd_common_ex(struct at_client *client, int retry, int timeout_ms, at_resp_status_t (*parse_func)(struct at_resp *resp), char *format, ...);
