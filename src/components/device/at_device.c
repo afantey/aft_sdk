@@ -35,7 +35,7 @@ void at_resp_set_info(struct at_resp *resp, size_t line_num)
     resp->line_num = line_num;
 }
 
-void at_obj_set_end_sign(at_client_t client, char ch)
+void at_obj_set_end_sign(struct at_client *client, char ch)
 {
     if (client == NULL)
     {
@@ -46,21 +46,47 @@ void at_obj_set_end_sign(at_client_t client, char ch)
     client->resp->end_sign = ch;
 }
 
-void at_obj_set_urc_table(at_client_t client, const struct at_urc *urc_table, size_t table_sz)
+void at_obj_set_urc_table(struct at_client *client, struct at_urc *urc_table, size_t table_sz)
 {
-    client->urc_table.urc = urc_table;
-    client->urc_table.urc_size = table_sz;
+    struct at_urc *current = &client->urc_list;
+    struct at_urc *check = NULL;
+
+    // 遍历urc_table数组
+    for (int i = 0; i < table_sz; i++)
+    {
+        // 检查链表中是否已经存在相同的节点
+        check = &client->urc_list;
+        while (check != NULL)
+        {
+            if (check == &urc_table[i])
+            {
+                // 如果找到相同的节点，跳过这个节点
+                break;
+            }
+            check = check->next;
+        }
+
+        // 如果没有找到相同的节点，将urc_table[i]添加到链表的末尾
+        if (check == NULL)
+        {
+            while (current->next != NULL)
+            {
+                current = current->next;
+            }
+            current->next = &urc_table[i];
+        }
+    }
 }
 
 
-static const struct at_urc *get_urc_obj(at_client_t client)
+static const struct at_urc *get_urc_obj(struct at_client *client)
 {
     size_t prefix_len, suffix_len;
     size_t bufsz;
-    char *buffer = NULL;
+    char *buffer = NULL;    
     const struct at_urc *urc = NULL;
 
-    if (client->urc_table.urc == NULL)
+    if (client->urc_list.next == NULL)
     {
         return NULL;
     }
@@ -68,14 +94,15 @@ static const struct at_urc *get_urc_obj(at_client_t client)
     buffer = client->recv_line_buf;
     bufsz = client->recv_line_len;
 
-    for (int i = 0; i < client->urc_table.urc_size; i++)
-    {
-        urc = &client->urc_table.urc[i];
+    urc = client->urc_list.next;
 
+    while(urc != NULL)
+    {
         prefix_len = strlen(urc->cmd_prefix);
         suffix_len = strlen(urc->cmd_suffix);
         if (bufsz < prefix_len + suffix_len)
         {
+            urc = urc->next;
             continue;
         }
         if ((prefix_len ? !strncmp(buffer, urc->cmd_prefix, prefix_len) : 1) &&
@@ -83,6 +110,7 @@ static const struct at_urc *get_urc_obj(at_client_t client)
         {
             return urc;
         }
+        urc = urc->next;
     }
 
     return NULL;
@@ -127,7 +155,7 @@ int at_resp_parse_line_args_by_kw(struct at_resp *resp, const char *keyword, con
 }
 
 
-static enum at_resp_rl_state at_recv_readline(at_client_t client, struct at_resp *resp)
+static enum at_resp_rl_state at_recv_readline(struct at_client *client, struct at_resp *resp)
 {
     int rl = 0;
     char ch = 0;
@@ -188,12 +216,12 @@ static enum at_resp_rl_state at_recv_readline(at_client_t client, struct at_resp
     return resp->rl_state;
 }
 
-static void at_parser_start(at_client_t client)
+static void at_parser_start(struct at_client *client)
 {
     client->resp->parser_state = AT_RESP_PARSER_STAT_START;
 }
 
-static enum at_resp_parser_state at_parser(at_client_t client, struct at_resp *resp)
+static enum at_resp_parser_state at_parser(struct at_client *client, struct at_resp *resp)
 {
     const struct at_urc *urc;
     
@@ -311,7 +339,7 @@ void at_parser_poll(struct at_client *client)
     }
 }
 
-int at_client_init(at_client_t client, sdk_uart_t *uart_port, uint8_t *recv_line_buf, size_t line_bufsz)
+int at_client_init(struct at_client *client, sdk_uart_t *uart_port, uint8_t *recv_line_buf, size_t line_bufsz)
 {
     int result = SDK_OK;
 //    sdk_err_t open_result = SDK_OK;

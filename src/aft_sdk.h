@@ -12,13 +12,12 @@
 #include "sdk_utils.h"
 #include "sdk_soft_timer.h"
 #include "sdk_os_port.h"
+#include "sdk_ringbuffer.h"
 
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-
 
 
 #ifdef __cplusplus
