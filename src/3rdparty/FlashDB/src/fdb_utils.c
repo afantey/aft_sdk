@@ -90,7 +90,7 @@ uint32_t fdb_calc_crc32(uint32_t crc, const void *buf, size_t size)
 
 size_t _fdb_set_status(uint8_t status_table[], size_t status_num, size_t status_index)
 {
-    size_t byte_index = ~0UL;
+    size_t byte_index = SIZE_MAX;
     /*
      * | write garn |       status0       |       status1       |      status2         |       status3      |
      * ------------------------------------------------------------------------------------------------------
@@ -156,7 +156,7 @@ fdb_err_t _fdb_write_status(fdb_db_t db, uint32_t addr, uint8_t status_table[], 
     byte_index = _fdb_set_status(status_table, status_num, status_index);
 
     /* the first status table value is all 1, so no need to write flash */
-    if (byte_index == ~0UL) {
+    if (byte_index == SIZE_MAX) {
         return FDB_NO_ERR;
     }
 #if (FDB_WRITE_GRAN == 1)
@@ -266,7 +266,7 @@ fdb_err_t _fdb_flash_read(fdb_db_t db, uint32_t addr, void *buf, size_t size)
 #endif
     } else {
 #ifdef FDB_USING_FAL_MODE
-        if (upm_partition_read(db->storage.part, addr, (uint8_t *) buf, size) < 0) {
+        if (fal_partition_read(db->storage.part, addr, (uint8_t *) buf, size) < 0) {
             result = FDB_READ_ERR;
         }
 #endif
@@ -287,7 +287,7 @@ fdb_err_t _fdb_flash_erase(fdb_db_t db, uint32_t addr, size_t size)
 #endif /* FDB_USING_FILE_MODE */
     } else {
 #ifdef FDB_USING_FAL_MODE
-        if (upm_partition_erase(db->storage.part, addr, size) < 0) {
+        if (fal_partition_erase(db->storage.part, addr, size) < 0) {
             result = FDB_ERASE_ERR;
         }
 #endif
@@ -308,7 +308,7 @@ fdb_err_t _fdb_flash_write(fdb_db_t db, uint32_t addr, const void *buf, size_t s
 #endif /* FDB_USING_FILE_MODE */
     } else {
 #ifdef FDB_USING_FAL_MODE
-        if (upm_partition_write(db->storage.part, addr, (uint8_t *)buf, size) < 0)
+        if (fal_partition_write(db->storage.part, addr, (uint8_t *)buf, size) < 0)
         {
             result = FDB_WRITE_ERR;
         }
