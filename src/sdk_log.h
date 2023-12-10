@@ -82,6 +82,10 @@ void sdklog_hexdump(uint32_t width, uint8_t *buf, uint32_t len);
 #define LOG_RAW(...)
 #endif
 
+#define log_i LOG_I
+#define log_w LOG_W
+#define log_e LOG_E
+
 #ifdef __cplusplus
 }
 #endif
