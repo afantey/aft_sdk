@@ -11,7 +11,7 @@ AlignEscapedNewlines: Right
 AlignArrayOfStructures: Left
 AlignConsecutiveMacros: AcrossEmptyLinesAndComments
 BraceWrapping:
-  AfterCaseLabel:  false
+  AfterCaseLabel:  true
   AfterClass:      false
   AfterControlStatement: true
   AfterEnum:       false
@@ -22,7 +22,7 @@ BraceWrapping:
   AfterUnion:      false
   AfterExternBlock: false
   BeforeCatch:     false
-  BeforeElse:      false
+  BeforeElse:      true
   IndentBraces:    false
   SplitEmptyFunction: true
   SplitEmptyRecord: true
