@@ -16,6 +16,12 @@
 #include <string.h>
 #include <inttypes.h>
 
+#ifdef FDB_USING_FILE_POSIX_MODE
+#if !defined(_MSC_VER)
+#include <unistd.h>
+#endif
+#endif /* FDB_USING_FILE_POSIX_MODE */
+
 #define FDB_LOG_TAG ""
 
 #if !defined(FDB_USING_FAL_MODE) && !defined(FDB_USING_FILE_MODE)
@@ -38,13 +44,14 @@ fdb_err_t _fdb_init_ex(fdb_db_t db, const char *name, const char *path, fdb_db_t
 
     if (db->file_mode) {
 #ifdef FDB_USING_FILE_MODE
+        memset(db->cur_file_sec, FDB_FAILED_ADDR, FDB_FILE_CACHE_TABLE_SIZE * sizeof(db->cur_file_sec[0]));
         /* must set when using file mode */
         FDB_ASSERT(db->sec_size != 0);
         FDB_ASSERT(db->max_size != 0);
 #ifdef FDB_USING_FILE_POSIX_MODE
-        db->cur_file = -1;
+        memset(db->cur_file, -1, FDB_FILE_CACHE_TABLE_SIZE * sizeof(db->cur_file[0]));
 #else
-        db->cur_file = 0;
+        memset(db->cur_file, 0, FDB_FILE_CACHE_TABLE_SIZE * sizeof(db->cur_file[0]));
 #endif
         db->storage.dir = path;
         FDB_ASSERT(strlen(path) != 0)
@@ -54,14 +61,14 @@ fdb_err_t _fdb_init_ex(fdb_db_t db, const char *name, const char *path, fdb_db_t
         size_t block_size;
 
         /* FAL (Flash Abstraction Layer) initialization */
-        upm_init();
+        fal_init();
         /* check the flash partition */
-        if ((db->storage.part = upm_partition_find(path)) == NULL) {
+        if ((db->storage.part = fal_partition_find(path)) == NULL) {
             FDB_INFO("Error: Partition (%s) not found.\n", path);
             return FDB_PART_NOT_FOUND;
         }
 
-        block_size = upm_stor_dev_find(db->storage.part->stor_dev_name)->blk_size;
+        block_size = fal_flash_device_find(db->storage.part->flash_name)->blk_size;
         if (db->sec_size == 0) {
             db->sec_size = block_size;
         } else {
@@ -114,18 +121,17 @@ void _fdb_deinit(fdb_db_t db)
 
     if (db->init_ok) {
 #ifdef FDB_USING_FILE_MODE
+        for (int i = 0; i < FDB_FILE_CACHE_TABLE_SIZE; i++) {
 #ifdef FDB_USING_FILE_POSIX_MODE
-        if (db->cur_file > 0) {
-#if !defined(_MSC_VER)
-#include <unistd.h>
-#endif
-            close(db->cur_file);
-        }
+            if (db->cur_file[i] > 0) {
+                close(db->cur_file[i]);
+            }
 #else
-        if (db->cur_file != 0) {
-            fclose(db->cur_file);
-        }
+            if (db->cur_file[i] != 0) {
+                fclose(db->cur_file[i]);
+            }
 #endif /* FDB_USING_FILE_POSIX_MODE */
+        }
 #endif /* FDB_USING_FILE_MODE */
     }
 
