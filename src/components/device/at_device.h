@@ -87,6 +87,7 @@ struct at_resp
      * == 0: the response data will auto return when received 'OK' or 'ERROR'
      * != 0: the response data will return when received setting lines number data */
     size_t line_num;
+    size_t line_len; // minimum line length, usually use when line_num == 1
     /* the count of received response lines */
     size_t line_counts;
 
@@ -126,7 +127,7 @@ struct at_client
     struct sdk_os_semaphore resp_notice;
 };
 
-void at_resp_set_info(struct at_resp *resp, size_t line_num);
+void at_resp_set_info(struct at_resp *resp, size_t line_num, size_t line_len);
 int at_client_init(struct at_client *client, sdk_uart_t *uart_port, uint8_t *recv_line_buf, size_t line_bufsz);
 void at_parser_poll(struct at_client *client);
 void at_obj_set_end_sign(struct at_client *client, char ch);

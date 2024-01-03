@@ -218,6 +218,32 @@ void sdk_uart_rx_isr(sdk_uart_t *uart)
     }
 }
 
+void sdk_uart_rx_getc(sdk_uart_t *uart, int ch)
+{
+    uart_rx_fifo_t *rx_fifo;
+
+    rx_fifo = &uart->rx_fifo;
+
+    if (ch == -1)
+        return;
+
+    if (uart->rx_callback != NULL)
+        uart->rx_callback(ch);
+    rx_fifo->buffer[rx_fifo->put_index] = ch;
+    rx_fifo->put_index += 1;
+    if (rx_fifo->put_index >= SDK_UART_RX_FIFO_LEN)
+        rx_fifo->put_index = 0;
+
+    /* if the next position is read index, discard this 'read char' */
+    if (rx_fifo->put_index == rx_fifo->get_index)
+    {
+        rx_fifo->get_index += 1;
+        rx_fifo->is_full = true;
+        if (rx_fifo->get_index >= SDK_UART_RX_FIFO_LEN)
+            rx_fifo->get_index = 0;
+    }
+}
+
 void sdk_uart_set_rx_callback(sdk_uart_t *uart, sdk_err_t (*rx_callback)(uint8_t ch))
 {
     uart->rx_callback = rx_callback;
