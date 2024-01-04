@@ -30,8 +30,9 @@
 //         }                                                                                                          \
 //     } while (0)
 
-void at_resp_set_info(struct at_resp *resp, size_t line_num)
+void at_resp_set_info(struct at_resp *resp, size_t line_num, size_t line_len)
 {
+    resp->line_len = line_len;
     resp->line_num = line_num;
 }
 
@@ -187,8 +188,9 @@ static enum at_resp_rl_state at_recv_readline(struct at_client *client, struct a
             }
         
             /* is newline or URC data */
-            if ((ch == '\n' && resp->last_ch == '\r') || (resp->end_sign != 0 && ch == resp->end_sign)
-                    || get_urc_obj(client))
+            if ((ch == '\n' && resp->last_ch == '\r' && resp->read_len >= resp->line_len) ||
+                (resp->end_sign != 0 && ch == resp->end_sign) ||
+                get_urc_obj(client))
             {
                 if (is_full)
                 {
