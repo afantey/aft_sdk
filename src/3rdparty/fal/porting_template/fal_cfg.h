@@ -1,33 +1,33 @@
 /**
  * Change Logs:
- * Date           Author       Notes
- * 2023-04-11     rgw          first version
+ * Date           Author          Notes
+ * 2024-01-19     rgw             first version
  */
 
-#ifndef __UPM_CFG_H
-#define __UPM_CFG_H
+#ifndef _FAL_CFG_H_
+#define _FAL_CFG_H_
 
 #include "sdk_board.h"
 
-extern const struct upm_stor_dev upm_flash_stm32;
+#define FAL_PART_HAS_TABLE_CFG
+#define NOR_FLASH_DEV_NAME             "norflash0"
 
-/* storage device table */
-#define UPM_STOR_DEV_TABLE                                           \
+/* ===================== Flash device Configuration ========================= */
+extern struct fal_flash_dev nor_flash0;
+
+/* flash device table */
+#define FAL_FLASH_DEV_TABLE                                          \
 {                                                                    \
-    &upm_flash_stm32,                                                 \
+    &nor_flash0,                                                     \
 }
-
 /* ====================== Partition Configuration ========================== */
-// magic_word, partition_name ,stor_dev_name , partition offset on storage, len, reserved
-#define UPT_PARTITION_TABLE                                                        \
-{                                                                                  \
-    {UPM_PART_MAGIC_WORD, "boot"       , "onchip", 0         , 4  * 1024, 0}, \
-    {UPM_PART_MAGIC_WORD, "primary"    , "onchip", 4   * 1024, 60 * 1024, 0}, \
-    {UPM_PART_MAGIC_WORD, "secondary"  , "onchip", 64  * 1024, 60 * 1024, 0}, \
-    {UPM_PART_MAGIC_WORD, "bl_param"   , "onchip", 124 * 1024, 1  * 1024, 0}, \
-    {UPM_PART_MAGIC_WORD, "fdb_kvdb1"  , "onchip", 125 * 1024, 1  * 1024, 0}, \
-    {UPM_PART_MAGIC_WORD, "fdb_tsdb1"  , "onchip", 126 * 1024, 1  * 1024, 0}, \
-    {UPM_PART_MAGIC_WORD, "otp"        , "onchip", 127 * 1024, 1  * 1024, 0}, \
+#ifdef FAL_PART_HAS_TABLE_CFG
+/* partition table */
+#define FAL_PART_TABLE                                                               \
+{                                                                                    \
+    {FAL_PART_MAGIC_WORD,  "fdb_tsdb1", NOR_FLASH_DEV_NAME,         0, 944*1024, 0}, \
+    {FAL_PART_MAGIC_WORD,  "download", NOR_FLASH_DEV_NAME, 944*1024, 1024*1024, 0}, \
 }
+#endif /* FAL_PART_HAS_TABLE_CFG */
 
-#endif /* __UPM_CFG_H */
+#endif /* _FAL_CFG_H_ */

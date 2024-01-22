@@ -29,23 +29,24 @@
 #endif
 
 #ifndef FAL_MALLOC
-#define FAL_MALLOC                     malloc
+#define FAL_MALLOC                     
 #endif
 
 #ifndef FAL_CALLOC
-#define FAL_CALLOC                     calloc
+#define FAL_CALLOC                     
 #endif
 
 #ifndef FAL_REALLOC
-#define FAL_REALLOC                    realloc
+#define FAL_REALLOC                    
 #endif
 
 #ifndef FAL_FREE
-#define FAL_FREE                       free
+#define FAL_FREE                       
 #endif
 
+int sdk_printf(const char *format, ...);
 #ifndef FAL_PRINTF
-#define FAL_PRINTF                     printf
+#define FAL_PRINTF                     sdk_printf
 #endif
 
 #ifndef FAL_DEBUG
