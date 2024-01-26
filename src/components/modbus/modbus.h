@@ -60,7 +60,7 @@ int bMB_ReadRegs(bModbusInstance_t *pModbusInstance, uint8_t addr, uint8_t func,
 int bMB_WriteRegs(bModbusInstance_t *pModbusInstance, uint8_t addr, uint8_t func, uint16_t reg,
                   uint16_t num, uint16_t *reg_value);
 int bMB_FeedReceivedData(bModbusInstance_t *pModbusInstance, uint8_t *pbuf, uint16_t len);
-
+uint16_t _bMBCRC16(uint8_t *pucFrame, uint16_t usLen);
 #ifdef __cplusplus
 }
 #endif
