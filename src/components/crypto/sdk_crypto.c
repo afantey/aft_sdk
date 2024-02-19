@@ -10,12 +10,12 @@
 #define DBG_LVL DBG_LOG
 #include "sdk_log.h"
 
+uint8_t encrypt_buff[512 + TC_AES_BLOCK_SIZE] = {0};
+uint8_t fill_buff[512] = {0};
 int sdk_crypto_encrypt_cbc(const uint8_t *in, int inlen, uint8_t *out, int *outlen, const uint8_t *iv, const uint8_t *key)
 {
-    uint8_t encrypt_buff[512+TC_AES_BLOCK_SIZE] = {0};
     struct tc_aes_key_sched_struct key_sched;
     int fill = 16 - (inlen) % 16;
-    uint8_t fill_buff[512] = {0};
     int ret;
     int enc_len;
 
@@ -42,9 +42,9 @@ int sdk_crypto_encrypt_cbc(const uint8_t *in, int inlen, uint8_t *out, int *outl
     return ret;
 }
 
+uint8_t encrypt_data[512 + TC_AES_BLOCK_SIZE] = {0};
 int sdk_crypto_decrypt_cbc(const uint8_t *in, int inlen, uint8_t *out, int *outlen, const uint8_t *iv, const uint8_t *key)
 {
-    uint8_t encrypt_data[512+TC_AES_BLOCK_SIZE] = {0};
     struct tc_aes_key_sched_struct key_sched;
     int ret;
 
