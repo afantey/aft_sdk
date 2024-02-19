@@ -3,7 +3,7 @@
  * Date           Author          Notes
  * 2023-11-27     rgw             first version
  */
-
+#include "aft_sdk.h"
 #include "sdk_ringbuffer.h"
 
 void sdk_ringbuffer_init(struct sdk_ringbuffer *rb, uint8_t *pool, int16_t size)

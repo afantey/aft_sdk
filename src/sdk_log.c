@@ -58,6 +58,19 @@ void sdklog(char *level, char *module, const char *format, ...)
     vsdklog(level, module, format, ap);
     va_end(ap);
 }
+int sdk_printf(const char *format, ...)
+{
+    va_list ap;
+    char buf[SDK_LOG_BUF_LEN];
+    
+    va_start(ap, format);
+    int len = vsnprintf(buf, SDK_LOG_BUF_LEN, format, ap);
+    va_end(ap);
+
+    sdk_hw_console_output(buf);
+
+    return len;
+}
 
 void sdklog_hexdump(uint32_t width, uint8_t *buf, uint32_t len)
 {
@@ -72,22 +85,7 @@ void sdklog_hexdump(uint32_t width, uint8_t *buf, uint32_t len)
         snprintf(temp, 4, "%02X ", buf[i]);
         sdk_hw_console_output(temp);
     }
-    snprintf(temp, 4, "%s", "\r\n");
-    sdk_hw_console_output(temp);
-}
-
-int sdk_printf(const char *format, ...)
-{
-    va_list ap;
-    char buf[SDK_LOG_BUF_LEN];
-    
-    va_start(ap, format);
-    int len = vsnprintf(buf, SDK_LOG_BUF_LEN, format, ap);
-    va_end(ap);
-
-    sdk_hw_console_output(buf);
-
-    return len;
+    sdk_printf("\r\n[%d Bytes]\r\n", len);
 }
 
 // int fputc(int ch, FILE *f)

@@ -43,12 +43,12 @@ int sdk_crypto_encrypt_cbc(const uint8_t *in, int inlen, uint8_t *out, int *outl
 }
 
 uint8_t encrypt_data[512 + TC_AES_BLOCK_SIZE] = {0};
-int sdk_crypto_decrypt_cbc(const uint8_t *in, int inlen, uint8_t *out, int *outlen, const uint8_t *iv, const uint8_t *key)
+int sdk_crypto_decrypt_cbc(const uint8_t *in, int inlen, uint8_t *out, const uint8_t *iv, const uint8_t *key)
 {
     struct tc_aes_key_sched_struct key_sched;
     int ret;
 
-    if(in == NULL||out == NULL || iv == NULL || key == NULL || outlen == NULL)
+    if(in == NULL||out == NULL || iv == NULL || key == NULL)
         return 0;
     if(inlen > sizeof(encrypt_data)-TC_AES_BLOCK_SIZE)
     {
@@ -64,9 +64,6 @@ int sdk_crypto_decrypt_cbc(const uint8_t *in, int inlen, uint8_t *out, int *outl
 
     ret = tc_cbc_mode_decrypt(out, inlen,
                                 encrypt_data+TC_AES_BLOCK_SIZE, inlen, encrypt_data, &key_sched);
-    if (ret == 1) {
-        *outlen = inlen;
-    }
 
     return ret;
 }
