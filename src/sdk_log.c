@@ -32,7 +32,7 @@ static void vsdklog(char *level, char *module, const char *format, va_list ap)
     unsigned int seconds = (uptime_ms / 1000) % 60;
     unsigned int milliseconds = uptime_ms % 1000;
 #endif
-    len = snprintf(buf, SDK_LOG_BUF_LEN, "%04d %02d:%02d:%02d.%04d <%d> %s %s ", days, hours, minutes, seconds, milliseconds, id, level, module);
+    len = snprintf(buf, SDK_LOG_BUF_LEN, "%04d %02d:%02d:%02d.%03d <%d> %s %s ", days, hours, minutes, seconds, milliseconds, id, level, module);
 //    len = snprintf(buf, SDK_LOG_BUF_LEN, "%s %s <%d> ", level, module, id);
     if(len >= SDK_LOG_BUF_LEN)
     {
@@ -58,6 +58,19 @@ void sdklog(char *level, char *module, const char *format, ...)
     vsdklog(level, module, format, ap);
     va_end(ap);
 }
+int sdk_printf(const char *format, ...)
+{
+    va_list ap;
+    char buf[SDK_LOG_BUF_LEN];
+    
+    va_start(ap, format);
+    int len = vsnprintf(buf, SDK_LOG_BUF_LEN, format, ap);
+    va_end(ap);
+
+    sdk_hw_console_output(buf);
+
+    return len;
+}
 
 void sdklog_hexdump(uint32_t width, uint8_t *buf, uint32_t len)
 {
@@ -72,22 +85,7 @@ void sdklog_hexdump(uint32_t width, uint8_t *buf, uint32_t len)
         snprintf(temp, 4, "%02X ", buf[i]);
         sdk_hw_console_output(temp);
     }
-    snprintf(temp, 4, "%s", "\r\n");
-    sdk_hw_console_output(temp);
-}
-
-int sdk_printf(const char *format, ...)
-{
-    va_list ap;
-    char buf[SDK_LOG_BUF_LEN];
-    
-    va_start(ap, format);
-    int len = vsnprintf(buf, SDK_LOG_BUF_LEN, format, ap);
-    va_end(ap);
-
-    sdk_hw_console_output(buf);
-
-    return len;
+    sdk_printf("\r\n[%d Bytes]\r\n", len);
 }
 
 // int fputc(int ch, FILE *f)

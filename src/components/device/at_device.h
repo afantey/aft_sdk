@@ -63,29 +63,31 @@ enum at_resp_parser_state
 
 enum at_resp_status
 {
-    AT_RESP_OK = 0,                   /* AT response end is OK */
-    AT_RESP_WAITING = 1,              /* AT response end is OK */
-    AT_RESP_ERROR = -1,               /* AT response end is ERROR */
-    AT_RESP_TIMEOUT = -2,             /* AT response is timeout */
-    AT_RESP_BUFF_FULL= -3,            /* AT response buffer is full */
+    AT_RESP_OK        =  0, /* AT response end is OK */
+    AT_RESP_WAITING   =  1, /* AT response end is OK */
+    AT_RESP_ERROR     = -1, /* AT response end is ERROR */
+    AT_RESP_TIMEOUT   = -2, /* AT response is timeout */
+    AT_RESP_BUFF_FULL = -3, /* AT response buffer is full */
 };
+
 typedef enum at_resp_status at_resp_status_t;
 
 struct at_resp
 {
     enum at_resp_rl_state rl_state;
-    size_t read_len;    //current read length
+    size_t read_len; // current read length
     char last_ch;
     char end_sign;
 
     enum at_resp_parser_state parser_state;
-    char *buf; //recv data until OK / ERROR / line limit or end_sign
+    char *buf; // recv data until OK / ERROR / line limit or end_sign
     size_t buf_len;
     size_t buf_size;
     /* the number of setting response lines, it set by `at_create_resp()` function
      * == 0: the response data will auto return when received 'OK' or 'ERROR'
      * != 0: the response data will return when received setting lines number data */
     size_t line_num;
+    size_t line_len; // minimum line length, usually use when line_num == 1
     /* the count of received response lines */
     size_t line_counts;
 
@@ -93,8 +95,6 @@ struct at_resp
 
     at_resp_status_t resp_status;
 };
-
-typedef struct at_response *at_response_t;
 
 struct at_client;
 
@@ -104,15 +104,8 @@ struct at_urc
     const char *cmd_prefix;
     const char *cmd_suffix;
     void (*func)(struct at_client *client, const char *data, size_t size);
+    struct at_urc *next;
 };
-typedef struct at_urc *at_urc_t;
-
-struct at_urc_table
-{
-    size_t urc_size;
-    const struct at_urc *urc;
-};
-typedef struct at_urc *at_urc_table_t;
 
 struct at_client
 {
@@ -126,19 +119,19 @@ struct at_client
     size_t line_bufsz;
     sdk_os_mutex_t lock;
 
-    struct at_urc_table urc_table;
+    // struct at_urc_table urc_table;
+    struct at_urc urc_list;
 
     struct at_cmd *cmd;
     struct at_resp *resp;
     struct sdk_os_semaphore resp_notice;
 };
-typedef struct at_client *at_client_t;
 
-void at_resp_set_info(struct at_resp *resp, size_t line_num);
-int at_client_init(at_client_t client, sdk_uart_t *uart_port, uint8_t *recv_line_buf, size_t line_bufsz);
+void at_resp_set_info(struct at_resp *resp, size_t line_num, size_t line_len);
+int at_client_init(struct at_client *client, sdk_uart_t *uart_port, uint8_t *recv_line_buf, size_t line_bufsz);
 void at_parser_poll(struct at_client *client);
-void at_obj_set_end_sign(at_client_t client, char ch);
-void at_obj_set_urc_table(at_client_t client, const struct at_urc *urc_table, size_t table_sz);
+void at_obj_set_end_sign(struct at_client *client, char ch);
+void at_obj_set_urc_table(struct at_client *client, struct at_urc *urc_table, size_t table_sz);
 int at_resp_parse_line_args_by_kw(struct at_resp *resp, const char *keyword, const char *resp_expr, ...);
 at_resp_status_t at_cmd_common(struct at_client *client, char *format, ...);
 at_resp_status_t at_cmd_common_ex(struct at_client *client, int retry, int timeout_ms, at_resp_status_t (*parse_func)(struct at_resp *resp), char *format, ...);
