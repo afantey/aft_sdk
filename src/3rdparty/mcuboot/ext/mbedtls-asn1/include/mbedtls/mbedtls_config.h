@@ -91,6 +91,10 @@
 #include MBEDTLS_USER_CONFIG_FILE
 #endif
 
+#define MBEDTLS_SHA224_C
+#define MBEDTLS_SHA256_C
+#define MBEDTLS_SHA512_C
+
 #include "check_config.h"
 
 #endif /* MBEDTLS_CONFIG_H */
