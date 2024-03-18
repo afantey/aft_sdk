@@ -12,7 +12,7 @@
 #define SDK_LOG_BUF_LEN 256
 #endif
 
-static uint32_t id;
+static unsigned int id;
 static void vsdklog(char *level, char *module, const char *format, va_list ap)
 {
     char buf[SDK_LOG_BUF_LEN];
