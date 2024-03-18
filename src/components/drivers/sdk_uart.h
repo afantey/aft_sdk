@@ -9,6 +9,7 @@
 
 #include "sdk_def.h"
 #include "sdk_os_port.h"
+#include "sdk_config.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -49,7 +50,7 @@ struct sdk_uart_settings
 
 struct _sdk_uart
 {
-    void *instance;
+    SDK_INSTANCE_TYPE instance;
     struct sdk_uart_settings settings;
     int32_t irq;
     int32_t irq_prio;
