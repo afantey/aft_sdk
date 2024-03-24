@@ -11,6 +11,83 @@
 #define DBG_LVL DBG_LOG
 #include "sdk_log.h"
 
+
+static double get_float_phys_from_hex(uint32_t hex, int offset, double factor)
+{
+    double phys = hex * factor + offset;
+    return phys;
+}
+
+static int get_int_phys_from_hex(uint32_t hex, int offset, double factor)
+{
+    int phys = (int)(hex * factor + offset);
+    return phys;
+}
+
+static uint16_t get_hex16_from_float_phys(double phys, int offset, double factor)
+{
+    uint16_t hex = (uint16_t)((phys - offset) / factor);
+    return hex;
+}
+
+static uint16_t get_hex16_from_int_phys(int phys, int offset, double factor)
+{
+    uint16_t hex = (uint16_t)((phys - offset) / factor);
+    return hex;
+}
+
+uint32_t get_hex32_from_float_phys(double phys, int offset, double factor)
+{
+    uint32_t hex = (uint32_t)((phys - offset) / factor);
+    return hex;
+}
+
+int unibus_get_reg(struct unibus_reg_struct *unibus_reg_array, int arraysz, uint16_t reg_idx, void *reg_content, uint16_t *reg_content_len)
+{
+    struct unibus_reg_struct *unibus_reg = NULL;
+
+    for(int i = 0; i < arraysz; i++)
+    {
+        if(unibus_reg_array[i].reg_idx == reg_idx)
+        {
+            unibus_reg = &unibus_reg_array[i];
+            break;
+        }
+    }
+    
+    if(unibus_reg == NULL)
+    {
+        return -1;
+    }
+    if((unibus_reg->reg_access & REG_ACCESS_TYPE_READ) != REG_ACCESS_TYPE_READ)
+    {
+        return -1;
+    }
+
+    switch (unibus_reg->type)
+    {
+    case REG_TYPE_UINT16:
+    {
+        
+    }
+    case REG_TYPE_INT16:
+    {
+        uint16_t data16;
+        get_int_phys_from_hex(unibus_reg->reg[0], unibus_reg->offset, unibus_reg->factor);
+
+        break;
+    }
+    case REG_TYPE_UINT32:
+    case REG_TYPE_INT32:
+        break;
+    case REG_TYPE_STRING:
+
+        break;
+    default:
+        break;
+    }
+}
+
 int unibus_init(unibus_t *ctx)
 {
     return 0;

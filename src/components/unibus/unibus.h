@@ -19,6 +19,36 @@ extern "C" {
 #endif
 
 
+enum unibus_reg_type
+{
+    REG_TYPE_UINT16,
+    REG_TYPE_INT16,
+    REG_TYPE_UINT32,
+    REG_TYPE_INT32,
+    REG_TYPE_FLOAT,
+    REG_TYPE_DOUBLE,
+    REG_TYPE_UINT8_ARRAY,
+    REG_TYPE_STRING,
+};
+
+#define REG_ACCESS_TYPE_READ   0x01
+#define REG_ACCESS_TYPE_WRITE  0x02
+#define REG_ACCESS_TYPE_RW    (REG_ACCESS_TYPE_READ | REG_ACCESS_TYPE_WRITE)
+
+struct unibus_reg_struct
+{
+    uint16_t *reg;
+    uint16_t reg_idx;
+    uint16_t reg_num;
+    int32_t offset;
+    float min;
+    float max;
+    enum unibus_reg_type type;
+    uint16_t reg_access;
+    double factor;
+};
+
+
 /******************************************************
  * 
  * UNIBUS配置参数
