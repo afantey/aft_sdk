@@ -123,13 +123,14 @@ typedef union
 #define SDK_CONTROL_UART_DISABLE_INT      (0) /**< Disable interrupt */
 #define SDK_CONTROL_UART_ENABLE_INT       (1) /**< Enable interrupt */
 #define SDK_CONTROL_UART_ENABLE_DMA       (2) /**< Enable DMA */
-#define SDK_CONTROL_UART_INT_IDLE_ENABLE  (3) /**< Enable idle interrupt */
-#define SDK_CONTROL_UART_INT_IDLE_DISABLE (4) /**< Disable idle interrupt */
-#define SDK_CONTROL_UART_INT_RTO_ENABLE   (5) /**< Enable receive timeout interrupt */
-#define SDK_CONTROL_UART_INT_RTO_DISABLE  (6) /**< Disable receive timeout interrupt */
-#define SDK_CONTROL_UART_GET_DMA_CNT      (7) /**< Get DMA count */
-#define SDK_CONTROL_UART_ENABLE_RX        (8) /**< Enable RX */
-#define SDK_CONTROL_UART_DISABLE_RX       (9) /**< Disable RX */
+#define SDK_CONTROL_UART_DISABLE_DMA      (3) /**< Disable DMA */
+#define SDK_CONTROL_UART_INT_IDLE_ENABLE  (4) /**< Enable idle interrupt */
+#define SDK_CONTROL_UART_INT_IDLE_DISABLE (5) /**< Disable idle interrupt */
+#define SDK_CONTROL_UART_INT_RTO_ENABLE   (6) /**< Enable receive timeout interrupt */
+#define SDK_CONTROL_UART_INT_RTO_DISABLE  (7) /**< Disable receive timeout interrupt */
+#define SDK_CONTROL_UART_GET_DMA_CNT      (8) /**< Get DMA count */
+#define SDK_CONTROL_UART_ENABLE_RX        (9) /**< Enable RX */
+#define SDK_CONTROL_UART_DISABLE_RX       (10) /**< Disable RX */
 
 #define SDK_CONTROL_RTC_GET_TIME      (0) /**< Get time */
 #define SDK_CONTROL_RTC_SET_TIME      (1) /**< Set time */

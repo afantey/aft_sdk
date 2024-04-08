@@ -17,6 +17,10 @@ extern "C" {
     #include "sdk_os_port.h"
 #endif
 
+#ifdef SDK_USE_RTTHREAD
+    // #include "sdk_os_port_rtthread.h"
+#endif
+
 typedef void* sdk_os_task_t;
 typedef void* sdk_os_mutex_t;
 

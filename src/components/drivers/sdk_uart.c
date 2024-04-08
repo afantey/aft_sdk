@@ -11,17 +11,33 @@
 void sdk_uart_open(sdk_uart_t *uart, int32_t baudrate, int32_t data_bit, char parity, int32_t stop_bit)
 {
     uart->ops.open(uart, baudrate, data_bit, parity, stop_bit);
-    uart->is_opened = true;
+    uart->state = UART_READY;
+    uart->txstate = UART_TX_IDLE;
+    uart->rxstate = UART_RX_IDLE;
 }
 
 void sdk_uart_close(sdk_uart_t *uart)
 {
     uart->ops.close(uart);
-    uart->is_opened = false;
+    uart->state = UART_STOP;
+    uart->txstate = UART_TX_IDLE;
+    uart->rxstate = UART_RX_IDLE;
 }
 
 int32_t sdk_uart_write(sdk_uart_t *uart, const uint8_t *data, int32_t len)
 {
+    if (uart->state != UART_READY || uart->ops.write == NULL)
+        return -1;
+
+    struct swtimer timer;
+    swtimer_set(&timer, 1000);
+    while (uart->txstate == UART_TX_ACTIVE)
+    {
+        if(swtimer_expired(&timer))
+            return -1;
+        sdk_os_delay_ms(1);
+    }
+    uart->txstate = UART_TX_ACTIVE;
     uart->ops.write(uart, data, len);
     return len;
 }

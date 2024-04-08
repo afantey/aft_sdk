@@ -8,6 +8,8 @@
 #include "sdk_def.h"
 #include "sdk_os_port.h"
 
+#include "rtthread.h"
+
 void sdk_os_init(void)
 {
 }
@@ -32,7 +34,7 @@ void sdk_os_task_delete(sdk_os_task_t task)
 
 void sdk_os_delay_ms(int delay_ms)
 {
-    sdk_hw_ms_delay(delay_ms);
+    rt_thread_mdelay(delay_ms);
 }
 
 sdk_err_t sdk_os_event_init(sdk_os_event_t event)

@@ -50,13 +50,36 @@ struct sdk_uart_settings
     int32_t stop_bit;
 };
 
+enum uartstate
+{
+    UART_UNINIT = 0,
+    UART_STOP = 1,
+    UART_READY = 2
+};
+
+enum uarttxstate
+{
+    UART_TX_IDLE = 0,
+    UART_TX_ACTIVE = 1,
+    UART_TX_COMPLETE = 2
+};
+
+enum uartrxstate
+{
+    UART_RX_IDLE = 0,
+    UART_RX_ACTIVE = 1,
+    UART_RX_COMPLETE = 2
+};
+
 struct _sdk_uart
 {
     SDK_INSTANCE_TYPE instance;
+    enum uartstate state;
+    enum uarttxstate txstate;
+    enum uartrxstate rxstate;
     struct sdk_uart_settings settings;
     int32_t irq;
     int32_t irq_prio;
-    bool is_opened;
     uart_rx_fifo_t rx_fifo;
     sdk_os_mutex_t lock;
     struct sdk_uart_ops ops;
