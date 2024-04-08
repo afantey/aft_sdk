@@ -35,6 +35,8 @@ struct sdk_uart_ops
 {
     int32_t (*open)(sdk_uart_t *uart, int32_t baudrate, int32_t data_bit, char parity, int32_t stop_bit);
     int32_t (*close)(sdk_uart_t *uart);
+    int32_t (*write)(sdk_uart_t *uart, const uint8_t *data, uint32_t len);
+    int32_t (*read)(sdk_uart_t *uart, uint8_t *data, uint32_t len);
     int32_t (*putc)(sdk_uart_t *uart, int32_t ch);
     int32_t (*getc)(sdk_uart_t *uart);
     int32_t (*control)(sdk_uart_t *uart, int32_t cmd, void *args);

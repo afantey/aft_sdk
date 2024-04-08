@@ -22,10 +22,7 @@ void sdk_uart_close(sdk_uart_t *uart)
 
 int32_t sdk_uart_write(sdk_uart_t *uart, const uint8_t *data, int32_t len)
 {
-    for(int32_t i = 0; i < len; i++)
-    {
-        uart->ops.putc(uart, data[i]);
-    }
+    uart->ops.write(uart, data, len);
     return len;
 }
 
