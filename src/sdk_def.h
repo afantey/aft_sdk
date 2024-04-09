@@ -131,6 +131,7 @@ typedef union
 #define SDK_CONTROL_UART_GET_DMA_CNT      (8) /**< Get DMA count */
 #define SDK_CONTROL_UART_ENABLE_RX        (9) /**< Enable RX */
 #define SDK_CONTROL_UART_DISABLE_RX       (10) /**< Disable RX */
+#define SDK_CONTROL_UART_UPDATE_STATE     (11) /**< Update state */
 
 #define SDK_CONTROL_RTC_GET_TIME      (0) /**< Get time */
 #define SDK_CONTROL_RTC_SET_TIME      (1) /**< Set time */

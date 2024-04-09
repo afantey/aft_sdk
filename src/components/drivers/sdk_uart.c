@@ -24,16 +24,21 @@ void sdk_uart_close(sdk_uart_t *uart)
     uart->rxstate = UART_RX_IDLE;
 }
 
+/**
+ * @note 调用串口发送前可能中断被关闭，所以不可以使用需要查询中断的功能，例如等待中断标志，或者通过systick计算超时
+ */
 int32_t sdk_uart_write(sdk_uart_t *uart, const uint8_t *data, int32_t len)
 {
     if (uart->state != UART_READY || uart->ops.write == NULL)
         return -1;
 
-    struct swtimer timer;
-    swtimer_set(&timer, 1000);
+    int timeout_cnt = 0;
+    int timerou_max = 1000;
+    sdk_uart_control(uart, SDK_CONTROL_UART_UPDATE_STATE, NULL);
     while (uart->txstate == UART_TX_ACTIVE)
     {
-        if(swtimer_expired(&timer))
+        sdk_uart_control(uart, SDK_CONTROL_UART_UPDATE_STATE, NULL);
+        if(timeout_cnt++ > timerou_max)
             return -1;
         sdk_os_delay_ms(1);
     }
