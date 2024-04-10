@@ -54,7 +54,7 @@ struct sdk_swi2c_ops
 struct _sdk_swi2c
 {
     bool is_opened;
-    sdk_os_mutex_t lock;
+    struct sdk_os_mutex lock;
     struct sdk_swi2c_ops *ops;
     int32_t retries;
 };

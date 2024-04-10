@@ -59,7 +59,7 @@ struct _sdk_can
 {
     bool is_opened;
     can_rx_mq_t rx_mq;
-    sdk_os_mutex_t lock;
+    struct sdk_os_mutex lock;
     struct sdk_can_ops ops;
 };
 

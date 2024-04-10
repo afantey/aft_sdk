@@ -11,6 +11,7 @@
 void sdk_uart_open(sdk_uart_t *uart, int32_t baudrate, int32_t data_bit, char parity, int32_t stop_bit)
 {
     uart->ops.open(uart, baudrate, data_bit, parity, stop_bit);
+    sdk_os_mutex_init(&uart->lock);
     uart->state = UART_READY;
     uart->txstate = UART_TX_IDLE;
     uart->rxstate = UART_RX_IDLE;
@@ -32,6 +33,7 @@ int32_t sdk_uart_write(sdk_uart_t *uart, const uint8_t *data, int32_t len)
     if (uart->state != UART_READY || uart->ops.write == NULL)
         return -1;
 
+    sdk_os_mutex_take(&uart->lock, 1000);
     int timeout_cnt = 0;
     int timerou_max = 1000;
     sdk_uart_control(uart, SDK_CONTROL_UART_UPDATE_STATE, NULL);
@@ -44,6 +46,7 @@ int32_t sdk_uart_write(sdk_uart_t *uart, const uint8_t *data, int32_t len)
     }
     uart->txstate = UART_TX_ACTIVE;
     uart->ops.write(uart, data, len);
+    sdk_os_mutex_release(&uart->lock);
     return len;
 }
 
@@ -194,13 +197,6 @@ int32_t sdk_uart_read_until(sdk_uart_t *uart, uint8_t *data, int32_t len, int32_
 int32_t sdk_uart_control(sdk_uart_t *uart, int32_t cmd, void *args)
 {
     return uart->ops.control(uart, cmd, args);
-}
-
-int sdk_hw_usart_init(sdk_uart_t *uart)
-{
-    uart->lock = sdk_os_mutex_create("uart1");
-
-    return SDK_OK;
 }
 
 void sdk_uart_rx_isr(sdk_uart_t *uart)

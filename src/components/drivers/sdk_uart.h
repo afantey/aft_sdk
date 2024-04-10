@@ -81,7 +81,7 @@ struct _sdk_uart
     int32_t irq;
     int32_t irq_prio;
     uart_rx_fifo_t rx_fifo;
-    sdk_os_mutex_t lock;
+    struct sdk_os_mutex lock;
     struct sdk_uart_ops ops;
     sdk_err_t (*rx_callback)(uint8_t ch);
     sdk_err_t (*rx_idle_callback)(void);

@@ -26,7 +26,7 @@ struct sdk_adc_ops
 struct _sdk_adc
 {
     bool is_opened;
-    sdk_os_mutex_t lock;
+    struct sdk_os_mutex lock;
     struct sdk_adc_ops ops;
 };
 

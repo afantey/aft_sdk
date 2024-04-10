@@ -26,7 +26,7 @@ struct sdk_rtc_ops
 struct _sdk_rtc
 {
     bool is_opened;
-    sdk_os_mutex_t lock;
+    struct sdk_os_mutex lock;
     struct sdk_rtc_ops ops;
 };
 

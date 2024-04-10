@@ -30,7 +30,7 @@ struct sdk_flash_ops
 struct _sdk_flash
 {
     bool is_opened;
-    sdk_os_mutex_t lock;
+    struct sdk_os_mutex lock;
     struct sdk_flash_ops ops;
 };
 
