@@ -77,6 +77,7 @@ struct _sdk_uart
     enum uartstate state;
     enum uarttxstate txstate;
     enum uartrxstate rxstate;
+    uint8_t use_dma_rx;
     struct sdk_uart_settings settings;
     int32_t irq;
     int32_t irq_prio;
