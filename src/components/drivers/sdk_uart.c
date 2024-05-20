@@ -10,6 +10,8 @@
 
 void sdk_uart_open(sdk_uart_t *uart, int32_t baudrate, int32_t data_bit, char parity, int32_t stop_bit)
 {
+    if(uart->state == UART_READY)
+        return;
     uart->ops.open(uart, baudrate, data_bit, parity, stop_bit);
     sdk_os_mutex_init(&uart->lock);
     uart->state = UART_READY;
@@ -35,37 +37,15 @@ int32_t sdk_uart_write(sdk_uart_t *uart, const uint8_t *data, int32_t len)
 
     // sdk_os_mutex_take(&uart->lock, 1000);
     int timeout_cnt = 0;
-    int timerou_max = 1000;
-    sdk_uart_control(uart, SDK_CONTROL_UART_UPDATE_STATE, NULL);
-    while (uart->txstate == UART_TX_ACTIVE)
-    {
-        sdk_uart_control(uart, SDK_CONTROL_UART_UPDATE_STATE, NULL);
-        // if(timeout_cnt++ > timerou_max)
-        //     return -1;
-        // sdk_os_delay_ms(1);
-        rt_thread_yield();
-    }
-    uart->txstate = UART_TX_ACTIVE;
-    uart->ops.write(uart, data, len);
-    // sdk_os_mutex_release(&uart->lock);
-    return len;
-}
-
-int32_t sdk_uart_write_unsafe(sdk_uart_t *uart, const uint8_t *data, int32_t len)
-{
-    if (uart->state != UART_READY || uart->ops.write == NULL)
-        return -1;
-
-    // sdk_os_mutex_take(&uart->lock, 1000);
-    int timeout_cnt = 0;
-    int timerou_max = 1000;
+    int timerou_max = len;
     sdk_uart_control(uart, SDK_CONTROL_UART_UPDATE_STATE, NULL);
     while (uart->txstate == UART_TX_ACTIVE)
     {
         sdk_uart_control(uart, SDK_CONTROL_UART_UPDATE_STATE, NULL);
         if(timeout_cnt++ > timerou_max)
-            return -1;
+            while(1);
         sdk_os_delay_ms(1);
+        // rt_thread_yield();
     }
     uart->txstate = UART_TX_ACTIVE;
     uart->ops.write(uart, data, len);
@@ -73,6 +53,19 @@ int32_t sdk_uart_write_unsafe(sdk_uart_t *uart, const uint8_t *data, int32_t len
     return len;
 }
 
+int32_t sdk_uart_write_cycle(sdk_uart_t *uart, const uint8_t *data, int32_t len)
+{
+    if (uart->state != UART_READY || uart->ops.write == NULL)
+        return -1;
+
+    for(int i = 0; i < len; i++)
+    {
+        uart->ops.putc(uart, data[i]);
+    }
+    return len;
+}
+
+#if UART_DMA_LEGACY
 static void sdk_uart_rx_dma(sdk_uart_t *uart)
 {
     uint32_t dma_cnt = 0;
@@ -98,6 +91,7 @@ static void sdk_uart_rx_dma(sdk_uart_t *uart)
         }
     }
 }
+#endif
 
 int32_t sdk_uart_read(sdk_uart_t *uart, uint8_t *data, int32_t len)
 {
@@ -113,7 +107,9 @@ int32_t sdk_uart_read(sdk_uart_t *uart, uint8_t *data, int32_t len)
         int ch;
 
         if (uart->use_dma_rx == 1)
-            // sdk_uart_rx_dma(uart);
+#if UART_DMA_LEGACY
+            sdk_uart_rx_dma(uart);
+#endif
             ;
         else
             sdk_hw_interrupt_disable();

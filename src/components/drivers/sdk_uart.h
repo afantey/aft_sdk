@@ -92,6 +92,7 @@ struct _sdk_uart
 void sdk_uart_open(sdk_uart_t *uart, int32_t baudrate, int32_t data_bit, char parity, int32_t stop_bit);
 void sdk_uart_close(sdk_uart_t *uart);
 int32_t sdk_uart_write(sdk_uart_t *uart, const uint8_t *data, int32_t len);
+int32_t sdk_uart_write_cycle(sdk_uart_t *uart, const uint8_t *data, int32_t len);
 int32_t sdk_uart_read(sdk_uart_t *uart, uint8_t *data, int32_t len);
 int32_t sdk_uart_read_until(sdk_uart_t *uart, uint8_t *data, int32_t len, int32_t timeout_ms);
 int32_t sdk_uart_control(sdk_uart_t *uart, int32_t cmd, void *args);
