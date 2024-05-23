@@ -71,9 +71,27 @@ enum uartrxstate
     UART_RX_COMPLETE = 2
 };
 
+struct sdk_uart_dma_config
+{
+    SDK_INSTANCE_TYPE dma_instance;
+    uint32_t clock;
+    uint32_t tx_dma_channel;
+    uint32_t tx_dma_channel_subperipheral;
+    uint32_t rx_dma_channel;
+    uint32_t rx_dma_channel_subperipheral;
+    uint8_t *tx_dma_buffer;
+    uint32_t tx_dma_buffer_size;
+    uint8_t *rx_dma_buffer;
+    uint32_t rx_dma_buffer_size;
+    int32_t rx_dma_irq;
+    int32_t rx_dma_irq_prio;
+};
+
 struct _sdk_uart
 {
     SDK_INSTANCE_TYPE instance;
+    struct sdk_uart_dma_config *dma_config;
+    uint32_t clock;
     enum uartstate state;
     enum uarttxstate txstate;
     enum uartrxstate rxstate;

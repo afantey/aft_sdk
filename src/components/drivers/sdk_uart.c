@@ -37,15 +37,16 @@ int32_t sdk_uart_write(sdk_uart_t *uart, const uint8_t *data, int32_t len)
 
     // sdk_os_mutex_take(&uart->lock, 1000);
     int timeout_cnt = 0;
-    int timerou_max = len;
+    int timerou_max = 10000;
     sdk_uart_control(uart, SDK_CONTROL_UART_UPDATE_STATE, NULL);
     while (uart->txstate == UART_TX_ACTIVE)
     {
         sdk_uart_control(uart, SDK_CONTROL_UART_UPDATE_STATE, NULL);
-        if(timeout_cnt++ > timerou_max)
-            while(1);
+        
+        if(timeout_cnt > timerou_max)
+            return -1;
+        timeout_cnt++;
         sdk_os_delay_ms(1);
-        // rt_thread_yield();
     }
     uart->txstate = UART_TX_ACTIVE;
     uart->ops.write(uart, data, len);
