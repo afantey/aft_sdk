@@ -67,6 +67,7 @@ void sdk_uart_close(sdk_uart_t *uart);
 int32_t sdk_uart_write(sdk_uart_t *uart, const uint8_t *data, int32_t len);
 int32_t sdk_uart_read(sdk_uart_t *uart, uint8_t *data, int32_t len);
 int32_t sdk_uart_read_until(sdk_uart_t *uart, uint8_t *data, int32_t len, int32_t timeout_ms);
+int32_t sdk_uart_read_wait(sdk_uart_t *uart, uint8_t *data, int32_t len, int32_t timeout_ms);
 int32_t sdk_uart_control(sdk_uart_t *uart, int32_t cmd, void *args);
 void sdk_uart_rx_isr(sdk_uart_t *uart);
 void sdk_uart_rx_getc(sdk_uart_t *uart, int ch);
