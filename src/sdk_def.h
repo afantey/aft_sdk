@@ -122,7 +122,7 @@ typedef union
 /* driver definitions */
 #define SDK_CONTROL_UART_DISABLE_INT      (0) /**< Disable interrupt */
 #define SDK_CONTROL_UART_ENABLE_INT       (1) /**< Enable interrupt */
-#define SDK_CONTROL_UART_ENABLE_DMA       (2) /**< Enable DMA */
+#define SDK_CONTROL_UART_ENABLE_DMA       (2) /**< Enable DMA, flag "rw","r","w" , NULL = "rw"*/
 #define SDK_CONTROL_UART_DISABLE_DMA      (3) /**< Disable DMA */
 #define SDK_CONTROL_UART_INT_IDLE_ENABLE  (4) /**< Enable idle interrupt */
 #define SDK_CONTROL_UART_INT_IDLE_DISABLE (5) /**< Disable idle interrupt */
