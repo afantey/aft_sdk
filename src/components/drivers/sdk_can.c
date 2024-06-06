@@ -16,11 +16,13 @@ sdk_err_t sdk_can_open(sdk_can_t *can)
     {
         return -SDK_E_INVALID;
     }
-
-    ret = can->ops.open(can);
-    if(ret == SDK_OK)
+    if(can->state == CAN_UNINIT)
     {
-        can->is_opened = true;
+        ret = can->ops.open(can);
+        if (ret == SDK_OK)
+        {
+            can->state = CAN_READY;
+        }
     }
     return ret;
 }
@@ -37,7 +39,7 @@ sdk_err_t sdk_can_close(sdk_can_t *can)
     ret = can->ops.close(can);
     if (ret == SDK_OK)
     {
-        can->is_opened = false;
+        can->state = CAN_UNINIT;
     }
 
     return ret;

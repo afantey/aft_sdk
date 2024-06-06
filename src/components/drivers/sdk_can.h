@@ -55,9 +55,25 @@ struct sdk_can_ops
     sdk_err_t (*control)(sdk_can_t *can, int32_t cmd, void *args);
 };
 
+enum canstate
+{
+    CAN_UNINIT   = 0, /**< Not initialized.           */
+    CAN_STOP     = 1, /**< Stopped.                   */
+    CAN_STARTING = 2, /**< Starting.                  */
+    CAN_STOPPING = 3, /**< Stopping.                  */
+    CAN_READY    = 4, /**< Ready.                     */
+    CAN_SLEEP    = 5 /**< Sleep state.               */
+};
+
 struct _sdk_can
 {
-    bool is_opened;
+    SDK_INSTANCE_TYPE instance;
+    uint32_t clock;
+    int32_t irq;
+    int32_t irq_prio;
+    enum canstate state;
+    int32_t can_fifo_num;
+    int32_t can_interrupt;
     can_rx_mq_t rx_mq;
     struct sdk_os_mutex lock;
     struct sdk_can_ops ops;
