@@ -65,6 +65,13 @@ enum canstate
     CAN_SLEEP    = 5 /**< Sleep state.               */
 };
 
+struct sdk_canid_table
+{
+    uint32_t canid;
+    int (*msg_handler)(void *dev, sdk_can_msg_t *msg);
+    struct sdk_canid_table *next;
+};
+
 struct _sdk_can
 {
     SDK_INSTANCE_TYPE instance;
@@ -77,6 +84,8 @@ struct _sdk_can
     can_rx_mq_t rx_mq;
     struct sdk_os_mutex lock;
     struct sdk_can_ops ops;
+    struct sdk_canid_table canid_list;
+    void *can_dev;
 };
 
 sdk_err_t sdk_can_open(sdk_can_t *can);
@@ -85,6 +94,8 @@ sdk_err_t sdk_can_write(sdk_can_t *can, sdk_can_msg_t *msg);
 int32_t sdk_can_read(sdk_can_t *can, sdk_can_msg_t *msg);
 sdk_err_t sdk_can_control(sdk_can_t *can, int32_t cmd, void *args);
 void sdk_can_rx_isr(sdk_can_t *can);
+int sdk_can_recv_poll(sdk_can_t *can);
+void sdk_can_register(sdk_can_t *can, void *can_dev, struct sdk_canid_table *canid_table, size_t table_sz);
 
 #ifdef __cplusplus
 }
