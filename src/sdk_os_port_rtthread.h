@@ -29,15 +29,28 @@ struct sdk_os_semaphore
 {
     struct rt_semaphore sem;
 };
-
+enum sdk_os_ipc_state
+{
+    UNINITIALIZED = 0,
+    INITIALIZED = 1
+} ;
 /*===========================================================================*/
 /* event type                                                                */
 /*===========================================================================*/
 struct sdk_os_event
 {
+    enum sdk_os_ipc_state state;
     struct rt_event event;
 };
 
+/*===========================================================================*/
+/* mq type                                                                   */
+/*===========================================================================*/
+struct sdk_os_mq
+{
+    enum sdk_os_ipc_state state;
+    struct rt_messagequeue mq;
+};
 
 #ifdef __cplusplus
 }

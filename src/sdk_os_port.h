@@ -49,6 +49,7 @@ typedef struct sdk_os_event *sdk_os_event_t;
 #define SDK_EVENT_FLAG_CLEAR             0x04            /**< clear flag */
 
 sdk_err_t sdk_os_event_init(sdk_os_event_t event);
+sdk_err_t sdk_os_event_deinit(sdk_os_event_t event);
 sdk_err_t sdk_os_event_delete(sdk_os_event_t event);
 sdk_err_t sdk_os_event_send(sdk_os_event_t event, uint32_t set);
 sdk_err_t sdk_os_event_recv(sdk_os_event_t event, uint32_t set, uint8_t option, int32_t timeout, uint32_t *recved);
@@ -61,6 +62,14 @@ sdk_err_t sdk_os_mutex_init(sdk_os_mutex_t mutex);
 sdk_err_t sdk_os_mutex_take(sdk_os_mutex_t mutex, int32_t timeout_ms);
 int sdk_os_mutex_release(sdk_os_mutex_t mutex);
 
+/*===========================================================================*/
+/* message queue                                                             */
+/*===========================================================================*/
+typedef struct sdk_os_mq *sdk_os_mq_t;
+sdk_err_t sdk_os_mq_init(sdk_os_mq_t mq, void *msg_pool, size_t msg_size, size_t pool_size);
+sdk_err_t sdk_os_mq_deinit(sdk_os_mq_t mq);
+sdk_err_t sdk_os_mq_send(sdk_os_mq_t mq, void *msg, size_t msg_size);
+sdk_err_t sdk_os_mq_recv(sdk_os_mq_t mq, void *msg, size_t msg_size, int32_t timeout_ms);
 #ifdef __cplusplus
 }
 #endif

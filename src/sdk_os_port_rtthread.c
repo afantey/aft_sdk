@@ -52,10 +52,13 @@ void sdk_os_exit_critical(void)
 sdk_err_t sdk_os_event_init(sdk_os_event_t event)
 {
     static int m_event_id = 0;
+    if(event ->state == INITIALIZED)
+        return SDK_OK;
     rt_event_t ep = &event->event;
     char name[8] = {0};
     snprintf(name, sizeof(name), "evt%d", m_event_id++);
     rt_event_init(ep, name, RT_IPC_FLAG_FIFO);
+    event ->state = INITIALIZED;
     return SDK_OK;
 }
 
@@ -104,6 +107,16 @@ sdk_err_t sdk_os_event_recv(sdk_os_event_t event, uint32_t set, uint8_t option, 
     return SDK_OK;
 }
 
+sdk_err_t sdk_os_event_deinit(sdk_os_event_t event)
+{
+    if(event ->state == UNINITIALIZED)
+        return SDK_OK;
+
+    rt_event_t ep = &event->event;
+    rt_event_detach(ep);
+    event ->state = UNINITIALIZED;
+    return SDK_OK;
+}
 /*===========================================================================*/
 /* Semaphore                                                                 */
 /*===========================================================================*/
@@ -185,5 +198,61 @@ int sdk_os_mutex_release(sdk_os_mutex_t mutex)
     {
         return -SDK_ERROR;
     }
+    return SDK_OK;
+}
+
+/*===========================================================================*/
+/* message queue                                                             */
+/*===========================================================================*/
+
+sdk_err_t sdk_os_mq_init(sdk_os_mq_t mq, void *msg_pool, size_t msg_size, size_t pool_size)
+{
+    static int m_mq_id = 0;
+    rt_err_t result;
+
+    if (mq->state == INITIALIZED)
+        return SDK_OK;
+    rt_mq_t mqp = &mq->mq;
+    char name[8] = {0};
+    snprintf(name, sizeof(name), "mq%d", m_mq_id++);
+    result = rt_mq_init(mqp, name, msg_pool, msg_size, pool_size, RT_IPC_FLAG_FIFO);
+    if (result != RT_EOK)
+        return -SDK_ERROR;
+    mq->state = INITIALIZED;
+    return SDK_OK;
+}
+
+sdk_err_t sdk_os_mq_deinit(sdk_os_mq_t mq)
+{
+    rt_err_t result;
+    if (mq->state == UNINITIALIZED)
+        return SDK_OK;
+    rt_mq_t mqp = &mq->mq;
+    result = rt_mq_detach(mqp);
+    if (result != RT_EOK)
+        return -SDK_ERROR;
+    mq->state = UNINITIALIZED;
+    return SDK_OK;
+}
+
+sdk_err_t sdk_os_mq_send(sdk_os_mq_t mq, void *msg, size_t msg_size)
+{
+    rt_err_t result;
+    rt_mq_t mqp = &mq->mq;
+    result = rt_mq_send(mqp, msg, msg_size);
+    if (result != RT_EOK)
+        return -SDK_ERROR;
+    return SDK_OK;
+}
+
+sdk_err_t sdk_os_mq_recv(sdk_os_mq_t mq, void *msg, size_t msg_size, int32_t timeout_ms)
+{
+    rt_err_t result;
+    rt_mq_t mqp = &mq->mq;
+    result = rt_mq_recv(mqp, msg, msg_size, timeout_ms);
+    if (result == -RT_ETIMEOUT)
+        return -SDK_E_TIMEOUT;
+    if (result != RT_EOK)
+        return -SDK_ERROR;
     return SDK_OK;
 }
