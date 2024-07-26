@@ -13,6 +13,7 @@
 #include "sdk_soft_timer.h"
 #include "sdk_os_port.h"
 #include "sdk_ringbuffer.h"
+#include "sdk_error.h"
 
 
 #ifdef __cplusplus
