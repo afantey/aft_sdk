@@ -173,6 +173,32 @@ int32_t sdk_uart_read_until(sdk_uart_t *uart, uint8_t *data, int32_t len, int32_
     return sum;
 }
 
+int32_t sdk_uart_read_wait(sdk_uart_t *uart, uint8_t *data, int32_t len, int32_t timeout_ms)
+{
+    uint32_t rl = 0;
+    uint32_t sum = 0;
+    int32_t timeout_cnt = timeout_ms;
+    
+    do
+    {
+        if (len - sum == 0)
+            break;
+        rl = sdk_uart_read(uart, data + sum, len - sum);
+        sum += rl;
+        if(rl == 0)
+        {
+            sdk_os_delay_ms(1);
+            timeout_cnt--;
+        }
+        else
+        {
+            timeout_cnt = timeout_ms;
+        }
+    } while (timeout_cnt);
+
+    return sum;
+}
+
 int32_t sdk_uart_control(sdk_uart_t *uart, int32_t cmd, void *args)
 {
     return uart->ops.control(uart, cmd, args);
