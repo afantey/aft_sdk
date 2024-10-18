@@ -1,8 +1,9 @@
 /**
  * Change Logs:
- * Date           Author       Notes
- * {data}         rgw          first version
+ * Date           Author          Notes
+ * 2023-04-13     rgw             first version
  */
+
 #include "aft_sdk.h"
 #include "sdk_uart.h"
 #include "sdk_board.h"
@@ -17,7 +18,7 @@
 uint8_t write_buf[TEST_DATA_SIZE];
 uint8_t read_buf[TEST_DATA_SIZE];
 
-int main(void)
+int testflash(void)
 {
     board_init();
     fal_init();
