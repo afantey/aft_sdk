@@ -9,6 +9,7 @@
 
 #include "sdk_def.h"
 #include "sdk_os_port.h"
+#include "sdk_config.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -34,6 +35,8 @@ struct sdk_uart_ops
 {
     int32_t (*open)(sdk_uart_t *uart, int32_t baudrate, int32_t data_bit, char parity, int32_t stop_bit);
     int32_t (*close)(sdk_uart_t *uart);
+    int32_t (*write)(sdk_uart_t *uart, const uint8_t *data, uint32_t len);
+    int32_t (*read)(sdk_uart_t *uart, uint8_t *data, uint32_t len);
     int32_t (*putc)(sdk_uart_t *uart, int32_t ch);
     int32_t (*getc)(sdk_uart_t *uart);
     int32_t (*control)(sdk_uart_t *uart, int32_t cmd, void *args);
@@ -47,15 +50,57 @@ struct sdk_uart_settings
     int32_t stop_bit;
 };
 
+enum uartstate
+{
+    UART_UNINIT = 0,
+    UART_STOP = 1,
+    UART_READY = 2
+};
+
+enum uarttxstate
+{
+    UART_TX_IDLE = 0,
+    UART_TX_ACTIVE = 1,
+    UART_TX_COMPLETE = 2
+};
+
+enum uartrxstate
+{
+    UART_RX_IDLE = 0,
+    UART_RX_ACTIVE = 1,
+    UART_RX_COMPLETE = 2
+};
+
+struct sdk_uart_dma_config
+{
+    SDK_INSTANCE_TYPE dma_instance;
+    uint32_t clock;
+    uint32_t tx_dma_channel;
+    uint32_t tx_dma_channel_subperipheral;
+    uint32_t rx_dma_channel;
+    uint32_t rx_dma_channel_subperipheral;
+    uint8_t *tx_dma_buffer;
+    uint32_t tx_dma_buffer_size;
+    uint8_t *rx_dma_buffer;
+    uint32_t rx_dma_buffer_size;
+    int32_t rx_dma_irq;
+    int32_t rx_dma_irq_prio;
+};
+
 struct _sdk_uart
 {
-    void *instance;
+    SDK_INSTANCE_TYPE instance;
+    struct sdk_uart_dma_config *dma_config;
+    uint32_t clock;
+    enum uartstate state;
+    enum uarttxstate txstate;
+    enum uartrxstate rxstate;
+    uint8_t use_dma_rx;
     struct sdk_uart_settings settings;
     int32_t irq;
     int32_t irq_prio;
-    bool is_opened;
     uart_rx_fifo_t rx_fifo;
-    sdk_os_mutex_t lock;
+    struct sdk_os_mutex lock;
     struct sdk_uart_ops ops;
     sdk_err_t (*rx_callback)(uint8_t ch);
     sdk_err_t (*rx_idle_callback)(void);
@@ -65,6 +110,7 @@ struct _sdk_uart
 void sdk_uart_open(sdk_uart_t *uart, int32_t baudrate, int32_t data_bit, char parity, int32_t stop_bit);
 void sdk_uart_close(sdk_uart_t *uart);
 int32_t sdk_uart_write(sdk_uart_t *uart, const uint8_t *data, int32_t len);
+int32_t sdk_uart_write_cycle(sdk_uart_t *uart, const uint8_t *data, int32_t len);
 int32_t sdk_uart_read(sdk_uart_t *uart, uint8_t *data, int32_t len);
 int32_t sdk_uart_read_until(sdk_uart_t *uart, uint8_t *data, int32_t len, int32_t timeout_ms);
 int32_t sdk_uart_read_wait(sdk_uart_t *uart, uint8_t *data, int32_t len, int32_t timeout_ms);

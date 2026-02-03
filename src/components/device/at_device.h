@@ -117,7 +117,7 @@ struct at_client
     size_t recv_line_len;
     /* The maximum supported receive data length */
     size_t line_bufsz;
-    sdk_os_mutex_t lock;
+    struct sdk_os_mutex lock;
 
     // struct at_urc_table urc_table;
     struct at_urc urc_list;

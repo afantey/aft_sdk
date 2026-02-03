@@ -14,28 +14,24 @@ extern "C" {
 #include "aft_sdk.h"
 
 #if defined(SDK_USE_NO_RTOS) || defined(SDK_USE_ZEPHYR)
-    #include "sdk_os_port.h"
+    #include "sdk_os_port_none.h"
 #endif
 
-typedef void* sdk_os_task_t;
-typedef void* sdk_os_mutex_t;
+#ifdef SDK_USE_RTTHREAD
+    #include "sdk_os_port_rtthread.h"
+#endif
 
-// ----------------------------------------------------------------------------
-// SEMAPHORE
-// ----------------------------------------------------------------------------
-enum sdk_os_sem_state
-{
-    SEM_STATE_START,
-    SEM_STATE_WAITING,
-    SEM_STATE_TIMEOUT,
-};
+#define SDK_WAITING_FOREVER              -1              /**< Block forever until get resource. */
+#define SDK_WAITING_NO                   0               /**< Non-block. */
 
-struct sdk_os_semaphore
-{
-    enum sdk_os_sem_state state;
-    struct swtimer timer;
-    uint16_t value;
-};
+void sdk_os_delay_ms(int delay_ms);
+void sdk_os_enter_critical(void);
+void sdk_os_exit_critical(void);
+
+
+/*===========================================================================*/
+/* semaphore                                                                 */
+/*===========================================================================*/
 typedef struct sdk_os_semaphore *sdk_os_sem_t;
 
 sdk_err_t sdk_os_sem_init(sdk_os_sem_t sem, int32_t count);
@@ -43,39 +39,37 @@ sdk_err_t sdk_os_sem_delete(sdk_os_sem_t sem);
 sdk_err_t sdk_os_sem_take(sdk_os_sem_t sem, int32_t timeout);
 sdk_err_t sdk_os_sem_release(sdk_os_sem_t sem);
 
-// ----------------------------------------------------------------------------
-// EVENT
-// ----------------------------------------------------------------------------
+/*===========================================================================*/
+/* event                                                                     */
+/*===========================================================================*/
+typedef struct sdk_os_event *sdk_os_event_t;
+
 #define SDK_EVENT_FLAG_AND               0x01            /**< logic and */
 #define SDK_EVENT_FLAG_OR                0x02            /**< logic or */
 #define SDK_EVENT_FLAG_CLEAR             0x04            /**< clear flag */
 
-enum sdk_os_event_state
-{
-    EVENT_STATE_START,
-    EVENT_STATE_WAITING,
-    EVENT_STATE_TIMEOUT,
-};
-
-struct sdk_os_event
-{
-    enum sdk_os_event_state state;
-    struct swtimer timer;
-    uint32_t set;
-};
-typedef struct sdk_os_event *sdk_os_event_t;
-
 sdk_err_t sdk_os_event_init(sdk_os_event_t event);
+sdk_err_t sdk_os_event_deinit(sdk_os_event_t event);
 sdk_err_t sdk_os_event_delete(sdk_os_event_t event);
 sdk_err_t sdk_os_event_send(sdk_os_event_t event, uint32_t set);
 sdk_err_t sdk_os_event_recv(sdk_os_event_t event, uint32_t set, uint8_t option, int32_t timeout, uint32_t *recved);
 
-// ----------------------------------------------------------------------------
-// MUTEX
-// ----------------------------------------------------------------------------
-sdk_os_mutex_t sdk_os_mutex_create(const char* name);
-void sdk_os_delay_ms(int delay_ms);
+/*===========================================================================*/
+/* mutex                                                                     */
+/*===========================================================================*/
+typedef struct sdk_os_mutex *sdk_os_mutex_t;
+sdk_err_t sdk_os_mutex_init(sdk_os_mutex_t mutex);
+sdk_err_t sdk_os_mutex_take(sdk_os_mutex_t mutex, int32_t timeout_ms);
+int sdk_os_mutex_release(sdk_os_mutex_t mutex);
 
+/*===========================================================================*/
+/* message queue                                                             */
+/*===========================================================================*/
+typedef struct sdk_os_mq *sdk_os_mq_t;
+sdk_err_t sdk_os_mq_init(sdk_os_mq_t mq, void *msg_pool, size_t msg_size, size_t pool_size);
+sdk_err_t sdk_os_mq_deinit(sdk_os_mq_t mq);
+sdk_err_t sdk_os_mq_send(sdk_os_mq_t mq, void *msg, size_t msg_size);
+sdk_err_t sdk_os_mq_recv(sdk_os_mq_t mq, void *msg, size_t msg_size, int32_t timeout_ms);
 #ifdef __cplusplus
 }
 #endif

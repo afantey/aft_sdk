@@ -10,26 +10,63 @@
 
 void sdk_uart_open(sdk_uart_t *uart, int32_t baudrate, int32_t data_bit, char parity, int32_t stop_bit)
 {
+    if(uart->state == UART_READY)
+        return;
     uart->ops.open(uart, baudrate, data_bit, parity, stop_bit);
-    uart->is_opened = true;
+    sdk_os_mutex_init(&uart->lock);
+    uart->state = UART_READY;
+    uart->txstate = UART_TX_IDLE;
+    uart->rxstate = UART_RX_IDLE;
 }
 
 void sdk_uart_close(sdk_uart_t *uart)
 {
     uart->ops.close(uart);
-    uart->is_opened = false;
+    uart->state = UART_STOP;
+    uart->txstate = UART_TX_IDLE;
+    uart->rxstate = UART_RX_IDLE;
 }
 
+/**
+ * @note 调用串口发送前可能中断被关闭，所以不可以使用需要查询中断的功能，例如等待中断标志，或者通过systick计算超时
+ */
 int32_t sdk_uart_write(sdk_uart_t *uart, const uint8_t *data, int32_t len)
 {
-    for(int32_t i = 0; i < len; i++)
+    if (uart->state != UART_READY || uart->ops.write == NULL)
+        return -1;
+
+    // sdk_os_mutex_take(&uart->lock, 1000);
+    int timeout_cnt = 0;
+    int timerou_max = 10000;
+    sdk_uart_control(uart, SDK_CONTROL_UART_UPDATE_STATE, NULL);
+    while (uart->txstate == UART_TX_ACTIVE)
+    {
+        sdk_uart_control(uart, SDK_CONTROL_UART_UPDATE_STATE, NULL);
+        
+        if(timeout_cnt > timerou_max)
+            return -1;
+        timeout_cnt++;
+        sdk_os_delay_ms(1);
+    }
+    uart->txstate = UART_TX_ACTIVE;
+    uart->ops.write(uart, data, len);
+    // sdk_os_mutex_release(&uart->lock);
+    return len;
+}
+
+int32_t sdk_uart_write_cycle(sdk_uart_t *uart, const uint8_t *data, int32_t len)
+{
+    if (uart->state != UART_READY || uart->ops.write == NULL)
+        return -1;
+
+    for(int i = 0; i < len; i++)
     {
         uart->ops.putc(uart, data[i]);
     }
     return len;
 }
 
-#if defined(SDK_UART_USING_DMA)
+#if UART_DMA_LEGACY
 static void sdk_uart_rx_dma(sdk_uart_t *uart)
 {
     uint32_t dma_cnt = 0;
@@ -55,48 +92,7 @@ static void sdk_uart_rx_dma(sdk_uart_t *uart)
         }
     }
 }
-
-int32_t sdk_uart_read(sdk_uart_t *uart, uint8_t *data, int32_t len)
-{
-    int size;
-    uart_rx_fifo_t *rx_fifo;
-
-    size = len;
-
-    rx_fifo = &uart->rx_fifo;
-
-    while (len)
-    {
-        int ch;
-        
-        sdk_uart_rx_dma(uart);
-
-        /* there's no data: */
-        if ((rx_fifo->get_index == rx_fifo->put_index) && (rx_fifo->is_full == false))
-        {
-            break;
-        }
-
-        /* otherwise there's the data: */
-        ch = rx_fifo->buffer[rx_fifo->get_index];
-        rx_fifo->get_index += 1;
-        if (rx_fifo->get_index >= SDK_UART_RX_FIFO_LEN)
-            rx_fifo->get_index = 0;
-
-        if (rx_fifo->is_full == true)
-        {
-            rx_fifo->is_full = false;
-        }
-
-        *data = ch & 0xff;
-        data++;
-        len--;
-    }
-
-    return size - len;
-}
-
-#else
+#endif
 
 int32_t sdk_uart_read(sdk_uart_t *uart, uint8_t *data, int32_t len)
 {
@@ -111,13 +107,20 @@ int32_t sdk_uart_read(sdk_uart_t *uart, uint8_t *data, int32_t len)
     {
         int ch;
 
-        sdk_hw_interrupt_disable();
+        if (uart->use_dma_rx == 1)
+#if UART_DMA_LEGACY
+            sdk_uart_rx_dma(uart);
+#endif
+            ;
+        else
+            sdk_hw_interrupt_disable();
 
         /* there's no data: */
         if ((rx_fifo->get_index == rx_fifo->put_index) && (rx_fifo->is_full == false))
         {
             /* no data, enable interrupt and break out */
-            sdk_hw_interrupt_enable();
+            if (uart->use_dma_rx != 1)
+                sdk_hw_interrupt_enable();
             break;
         }
 
@@ -132,7 +135,8 @@ int32_t sdk_uart_read(sdk_uart_t *uart, uint8_t *data, int32_t len)
             rx_fifo->is_full = false;
         }
 
-        sdk_hw_interrupt_enable();
+        if(uart->use_dma_rx != 1)
+            sdk_hw_interrupt_enable();
 
         *data = ch & 0xff;
         data++;
@@ -141,9 +145,6 @@ int32_t sdk_uart_read(sdk_uart_t *uart, uint8_t *data, int32_t len)
 
     return size - len;
 }
-
-#endif
-
 
 int32_t sdk_uart_read_until(sdk_uart_t *uart, uint8_t *data, int32_t len, int32_t timeout_ms)
 {
@@ -201,14 +202,18 @@ int32_t sdk_uart_read_wait(sdk_uart_t *uart, uint8_t *data, int32_t len, int32_t
 
 int32_t sdk_uart_control(sdk_uart_t *uart, int32_t cmd, void *args)
 {
+    switch (cmd)
+    {
+    case SDK_CONTROL_UART_ENABLE_DMA:
+        uart->use_dma_rx = 1;
+        break;
+    case SDK_CONTROL_UART_DISABLE_DMA:
+        uart->use_dma_rx = 0;
+        break;
+    default:
+        break;
+    }
     return uart->ops.control(uart, cmd, args);
-}
-
-int sdk_hw_usart_init(sdk_uart_t *uart)
-{
-    uart->lock = sdk_os_mutex_create("uart1");
-
-    return SDK_OK;
 }
 
 void sdk_uart_rx_isr(sdk_uart_t *uart)

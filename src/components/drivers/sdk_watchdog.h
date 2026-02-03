@@ -21,7 +21,7 @@ struct sdk_watchdog_ops
 struct sdk_watchdog_device
 {
     bool is_opened;
-    sdk_os_mutex_t lock;
+    struct sdk_os_mutex lock;
     struct sdk_watchdog_ops ops;
 };
 

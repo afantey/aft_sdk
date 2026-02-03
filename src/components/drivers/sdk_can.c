@@ -16,11 +16,13 @@ sdk_err_t sdk_can_open(sdk_can_t *can)
     {
         return -SDK_E_INVALID;
     }
-
-    ret = can->ops.open(can);
-    if(ret == SDK_OK)
+    if(can->state == CAN_UNINIT)
     {
-        can->is_opened = true;
+        ret = can->ops.open(can);
+        if (ret == SDK_OK)
+        {
+            can->state = CAN_READY;
+        }
     }
     return ret;
 }
@@ -37,7 +39,7 @@ sdk_err_t sdk_can_close(sdk_can_t *can)
     ret = can->ops.close(can);
     if (ret == SDK_OK)
     {
-        can->is_opened = false;
+        can->state = CAN_UNINIT;
     }
 
     return ret;
@@ -127,4 +129,90 @@ void sdk_can_rx_isr(sdk_can_t *can)
             rx_mq->get_index = 0;
     }
     sdk_hw_interrupt_enable();
+}
+
+
+static const struct sdk_canid_table *get_canid_table_obj(sdk_can_t *can, uint32_t canid)
+{
+    const struct sdk_canid_table *canid_table = NULL;
+
+    if (can->canid_list.next == NULL)
+    {
+        return NULL;
+    }
+
+    canid_table = can->canid_list.next;
+
+    while(canid_table != NULL)
+    {
+        if (canid_table->canid == canid)
+        {
+            return canid_table;
+        }
+        else
+        {
+            canid_table = canid_table->next;
+            continue;
+        }
+    }
+
+    return NULL;
+}
+
+static int sdk_can_msg_parse(sdk_can_t *can, sdk_can_msg_t *msg)
+{
+    int ret = 0;
+    const struct sdk_canid_table *canid_table = NULL;
+    canid_table = get_canid_table_obj(can, msg->canid);
+    if(canid_table != NULL && canid_table->msg_handler != NULL)
+    {
+        ret = canid_table->msg_handler(can->can_dev, msg);
+    }
+
+    return ret;
+}
+
+int sdk_can_recv_poll(sdk_can_t *can)
+{
+    sdk_can_msg_t msg = {0};
+    int rl = sdk_can_read(can, &msg);
+    if(rl > 0)
+    {
+        sdk_can_msg_parse(can, &msg);
+    }
+    return rl;
+}
+
+void sdk_can_register(sdk_can_t *can, void *can_dev, struct sdk_canid_table *canid_table, size_t table_sz)
+{
+    can->can_dev = can_dev;
+
+    struct sdk_canid_table *current = &can->canid_list;
+    struct sdk_canid_table *check = NULL;
+
+    // 遍历canid_table数组
+    for (int i = 0; i < table_sz; i++)
+    {
+        // 检查链表中是否已经存在相同的节点
+        check = &can->canid_list;
+        while (check != NULL)
+        {
+            if (check == &canid_table[i])
+            {
+                // 如果找到相同的节点，跳过这个节点
+                break;
+            }
+            check = check->next;
+        }
+
+        // 如果没有找到相同的节点，将canid_table[i]添加到链表的末尾
+        if (check == NULL)
+        {
+            while (current->next != NULL)
+            {
+                current = current->next;
+            }
+            current->next = &canid_table[i];
+        }
+    }
 }
